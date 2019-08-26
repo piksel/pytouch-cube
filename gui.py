@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
 import os
-import pathlib
 from enum import Enum, auto
 
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QPixmap, QImage, QStandardItemModel, QStandardItem, QIcon, QPainter, QColor, QFont, QPicture, \
-    QFontMetrics, QDragEnterEvent, QDropEvent
+from PyQt5.QtCore import Qt, pyqtSignal, QDir, QModelIndex, QSortFilterProxyModel
+from PyQt5.QtGui import QPixmap, QImage, QStandardItemModel, QPainter, QColor, QDragEnterEvent, QDropEvent, \
+    QStandardItem
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QFileDialog, QHBoxLayout, \
-    QTreeView, QGroupBox, QInputDialog, QLineEdit, QLayout, QMessageBox, QMainWindow, QMenuBar, QAction
+    QTreeView, QGroupBox, QInputDialog, QMessageBox, QMainWindow, QMenuBar, QAction, QComboBox, QFileSystemModel
 
-from printables import *
 from printables.barcode import BarcodeData, Barcode
 from printables.image import ImageData, Image
 from printables.printable import Printable
-from printables.text import TextPropsEdit, TextData, Text
+from printables.text import TextData, Text
 
 APP_NAME = 'PyTouch Cube Editor'
 APP_VERSION = 'v0.1'
@@ -148,6 +146,44 @@ class PyTouchCubeGUI(QMainWindow):
         layout.addWidget(self.save_image_button)
         group.setLayout(layout)
         root.addWidget(group)
+
+        printer_select = QComboBox(self)
+        fs_model = QFileSystemModel(self)
+        #model_proxy = QSortFilterProxyModel(self)
+        #model_proxy.setSourceModel(fs_model)
+        # fs_model.setNameFilters(['tty.PT-P3*'])
+
+
+        printers = QStandardItemModel()
+        for p in QDir('/dev').entryList(['tty*'], QDir.System, QDir.Name):
+            printers.appendRow(QStandardItem('/dev/' + p))
+        #print(printers.entryList())
+
+
+        #model_proxy.setRecursiveFilteringEnabled(True)
+        #model_proxy.setFilterKeyColumn(0)
+
+        fs_model.setRootPath('/dev/')#/Users/nilsmasen')
+        fs_model.setFilter( QDir.System  )
+        dev_index = fs_model.index('/dev')
+        #proxy_dev = model_proxy.mapFromSource(dev_index)
+
+
+
+        printer_select.setModel(printers)
+        #printer_select.setRootModelIndex(dev_index)
+        #printer_select.setRootIndex(dev_index)
+        #printer_select.setExpanded(dev_index, True)
+        #model_proxy.setFilterWildcard('tty*')
+
+
+        bottom_bar = QHBoxLayout()
+        #bottom_bar.addStretch()
+        bottom_bar.addWidget(printer_select)
+        # /dev/tty.PT-P300BT0607-Serial
+        bottom_bar.addWidget(QPushButton('Print'))
+
+        root.addLayout(bottom_bar)
 
         root_widget = QWidget()
         root_widget.setLayout(root)
