@@ -2,6 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QImage, QPainter, QFontMetrics
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QLabel, QPushButton, QFontDialog
 
+from labelmaker import USABLE_HEIGHT
 from printables.printable import Printable, PrintableData
 from printables.propsedit import PropsEdit
 
@@ -13,7 +14,7 @@ class TextData(PrintableData):
 
         font = QFont()
         if font_string is None:
-            font.setPixelSize(128)
+            font.setPixelSize(USABLE_HEIGHT)
         else:
             font.fromString(font_string)
         self.font = font
@@ -80,11 +81,11 @@ class Text(Printable):
         font = d.font
         width = QFontMetrics(font).width(d.text)
         print(width, font.toString())
-        img = QImage(width, 128, QImage.Format_ARGB32)
+        img = QImage(width, USABLE_HEIGHT, QImage.Format_ARGB32)
         img.fill(0xffffffff)
         p = QPainter(img)
         p.setFont(font)
-        p.drawText(img.rect(), Qt.AlignLeft, d.text)
+        p.drawText(img.rect().adjusted(0, -20, 0, 0), Qt.AlignLeft | Qt.AlignHCenter, d.text)
         p.end()
         del p
         return img

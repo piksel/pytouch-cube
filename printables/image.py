@@ -4,6 +4,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QImage, QPainter, QPixmap, QIcon
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QLabel
 
+from labelmaker import USABLE_HEIGHT
 from printables.printable import Printable, PrintableData
 
 
@@ -21,8 +22,8 @@ class ImagePropsEdit(QWidget):
 
         self.edit_text = QLineEdit('', self)
         self.preview_image = QLabel()
-        self.preview_image.setFixedHeight(128)
-        self.preview_image.setMaximumWidth(256)
+        self.preview_image.setFixedHeight(USABLE_HEIGHT)
+        self.preview_image.setMaximumWidth(USABLE_HEIGHT * 2)
 
         layout.addWidget(self.preview_image)
         layout.addWidget(QLabel('Source:'))
@@ -32,7 +33,7 @@ class ImagePropsEdit(QWidget):
         self.setLayout(layout)
 
     def setData(self, data: ImageData):
-        self.preview_image.setPixmap(QPixmap(data.source).scaledToHeight(128))
+        self.preview_image.setPixmap(QPixmap(data.source).scaledToHeight(USABLE_HEIGHT))
         self.edit_text.setText(data.source)
 
 
@@ -80,4 +81,4 @@ class Image(Printable):
         else:
             img = img_src
         # img.convertToFormat(QImage.Format_Mono)
-        return img.scaledToHeight(128, Qt.FastTransformation)
+        return img.scaledToHeight(USABLE_HEIGHT, Qt.FastTransformation)

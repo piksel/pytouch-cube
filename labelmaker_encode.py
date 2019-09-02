@@ -3,7 +3,7 @@ import png
 import struct
 
 # "Raster graphics transfer" serial command
-TRANSFER_COMMAND = b"\x47"
+TRANSFER_COMMAND = 0x47
 
 unsigned_char = struct.Struct('B');
 def as_unsigned_char(byte):
@@ -18,7 +18,7 @@ def encode_raster_transfer(data):
     # This mirrors the official app from Brother. Other values haven't been tested.
     chunk_size = 16
 
-    for i in xrange(0, len(data), chunk_size):
+    for i in range(0, len(data), chunk_size):
         chunk = data[i : i + chunk_size]
 
         # Encode as tiff
@@ -29,8 +29,8 @@ def encode_raster_transfer(data):
 
         # Write number of bytes to transfer (n1 + n2*256)
         length = len(packed_chunk)
-        buf.append(unsigned_char.pack( int(length % 256) ))
-        buf.append(unsigned_char.pack( int(length / 256) ))
+        buf.append( int(length % 256) )
+        buf.append( int(length / 256) )
 
         # Write data
         buf.extend(packed_chunk)
@@ -85,7 +85,7 @@ def read_png(path):
 
     # Loop over image and pack into 1bpp buffer
     for row in rows:
-        for pixel in xrange(0, len(row), 3):
+        for pixel in range(0, len(row), 3):
             bit_cursor -= 1
 
             if row[pixel] == 0:

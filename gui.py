@@ -8,6 +8,8 @@ from PyQt5.QtGui import QPixmap, QImage, QStandardItemModel, QPainter, QColor, Q
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QFileDialog, QHBoxLayout, \
     QTreeView, QGroupBox, QInputDialog, QMessageBox, QMainWindow, QMenuBar, QAction, QComboBox, QFileSystemModel
 
+from labelmaker import LabelMaker, USABLE_HEIGHT, PRINT_MARGIN, BUFFER_HEIGHT
+from labelmaker_encode import unsigned_char
 from printables.barcode import BarcodeData, Barcode
 from printables.image import ImageData, Image
 from printables.printable import Printable
@@ -19,7 +21,6 @@ APP_VERSION = 'v0.1'
 class ModelCol(Enum):
     TYPE = 0
     DATA = 1
-
 
 class ItemType(Enum):
     IMAGE = auto()
@@ -75,6 +76,7 @@ class PyTouchCubeGUI(QMainWindow):
 
     item_selected = None
     props_current = None
+    printer_select = None
 
     def __init__(self, app: QApplication):
         super().__init__()
@@ -86,7 +88,7 @@ class PyTouchCubeGUI(QMainWindow):
         app.setApplicationDisplayName(APP_NAME)
 
         self.preview_image = QLabel('No image selected')
-        self.preview_image.setFixedHeight(128)
+        self.preview_image.setFixedHeight(USABLE_HEIGHT)
 
         add_image_button = QPushButton('Add image')
         add_image_button.clicked.connect(self.add_image)
@@ -147,7 +149,7 @@ class PyTouchCubeGUI(QMainWindow):
         group.setLayout(layout)
         root.addWidget(group)
 
-        printer_select = QComboBox(self)
+        self.printer_select = QComboBox(self)
         fs_model = QFileSystemModel(self)
         #model_proxy = QSortFilterProxyModel(self)
         #model_proxy.setSourceModel(fs_model)
@@ -170,7 +172,7 @@ class PyTouchCubeGUI(QMainWindow):
 
 
 
-        printer_select.setModel(printers)
+        self.printer_select.setModel(printers)
         #printer_select.setRootModelIndex(dev_index)
         #printer_select.setRootIndex(dev_index)
         #printer_select.setExpanded(dev_index, True)
@@ -179,9 +181,11 @@ class PyTouchCubeGUI(QMainWindow):
 
         bottom_bar = QHBoxLayout()
         #bottom_bar.addStretch()
-        bottom_bar.addWidget(printer_select)
+        bottom_bar.addWidget(self.printer_select)
         # /dev/tty.PT-P300BT0607-Serial
-        bottom_bar.addWidget(QPushButton('Print'))
+        print_button = QPushButton('Print')
+        bottom_bar.addWidget(print_button)
+        print_button.clicked.connect(self.print_clicked)
 
         root.addLayout(bottom_bar)
 
@@ -219,10 +223,10 @@ class PyTouchCubeGUI(QMainWindow):
     def run(self):
 
         self.show()
-        self.add_item(Text(TextData('Foo')))
-        self.add_item(Text(TextData('Bar')))
-        self.add_item(Barcode(BarcodeData('123456789012')))
-        self.add_item(Barcode(BarcodeData('ACE222', 'code128')))
+        # self.add_item(Text(TextData('hallå biblan!')))
+        #self.add_item(Text(TextData('Bar')))
+        # self.add_item(Barcode(BarcodeData('123456789012')))
+        # self.add_item(Barcode(BarcodeData('ACE222', 'code128')))
 
         self.app.exec_()
 
@@ -239,6 +243,42 @@ class PyTouchCubeGUI(QMainWindow):
         if len(image_path) > 0:
             data = ImageData(image_path)
             self.add_item(Image(data))
+
+    def print_clicked(self):
+        buf = bytearray()
+
+        # State for bit packing
+        bit_cursor = 8
+        byte = 0
+        for x in range(0, self.print_image.width()):
+            for y in range(0, BUFFER_HEIGHT):
+                if y < PRINT_MARGIN or y > (BUFFER_HEIGHT - PRINT_MARGIN):
+                    pixel = 0xffffffff
+                else:
+                    pixel = self.print_image.pixel(x, y - PRINT_MARGIN)
+
+                bit_cursor -= 1
+
+                if pixel <= 0xff000000:
+                    #print('#', end='')
+                    byte |= (1 << bit_cursor)
+                else:
+                    pass
+                    #print(' ', end='')
+
+                if bit_cursor == 0:
+                    # packed = unsigned_char.pack(byte)
+                    buf.append(byte)
+                    byte = 0
+                    bit_cursor = 8
+
+
+
+            # print()
+        print('Printing label, width:', self.print_image.width(), 'height:', self.print_image.height())
+        print_device = self.printer_select.currentText()
+        lm = LabelMaker(lambda s: print(s), print_device)
+        lm.print_label(buf)
 
     def on_add_text(self):
         text, etc = QInputDialog.getText(self, 'Add text', 'Enter text:')
@@ -290,7 +330,7 @@ class PyTouchCubeGUI(QMainWindow):
             width_needed += render.width()
 
         x = 0
-        image = QImage(width_needed, 128, QImage.Format_Mono)
+        image = QImage(width_needed, USABLE_HEIGHT, QImage.Format_Mono)
         image.fill(QColor(255, 255, 255))
         painter = QPainter(image)
         for render in iter(item_renders):
@@ -299,6 +339,7 @@ class PyTouchCubeGUI(QMainWindow):
         painter.end()
         del painter
 
+        self.print_image = image
         self.preview_image.setPixmap(QPixmap.fromImage(image))
 
     def update_props(self):

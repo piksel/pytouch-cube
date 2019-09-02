@@ -3,6 +3,7 @@ from PyQt5.QtGui import QFont, QFontMetrics, QImage, QPainter, QColor, QStandard
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QLabel, QComboBox
 from barcode.writer import BaseWriter
 
+from labelmaker import USABLE_HEIGHT
 from printables.printable import Printable, PrintableData
 import barcode
 
@@ -68,8 +69,8 @@ class BarcodePropsEdit(PropsEdit):
 
 
 class BarcodeWriter(BaseWriter):
-    dpi = 10
-    text_size = 30
+    dpi = 15
+    text_size = 20
 
     def __init__(self):
         BaseWriter.__init__(self, self._init, self._create_module,
@@ -80,7 +81,7 @@ class BarcodeWriter(BaseWriter):
         print('init', code)
         width, height = self.calculate_size(len(code[0]), len(code), self.dpi * 25)
         print(width, height)
-        image = QImage(width, 128, QImage.Format_ARGB32)
+        image = QImage(width, USABLE_HEIGHT, QImage.Format_ARGB32)
         image.fill(0xffffffff)
         self._painter = QPainter(image)
         self._image = image
@@ -97,11 +98,12 @@ class BarcodeWriter(BaseWriter):
         x1 = xpos * self.dpi
         y1 = 0
         x2 = width * self.dpi
-        y2 = 128
+        y2 = USABLE_HEIGHT
         p.drawRect(x1, y1, x2, y2)
         pass
 
     def _create_text(self, xpos, ypos):
+        return
         print('_create_text', xpos, ypos)
         if self.human != '':
             barcodetext = self.human
