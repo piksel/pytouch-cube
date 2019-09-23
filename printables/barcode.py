@@ -28,7 +28,6 @@ class BarcodePropsEdit(PropsEdit):
     def __init__(self, data: BarcodeData, parent, printable):
         super().__init__(data, parent, printable)
         self.setMinimumWidth(256)
-        layout = QVBoxLayout()
 
         self.combo_type = QComboBox()
         model = QStandardItemModel(0, 2)
@@ -42,17 +41,15 @@ class BarcodePropsEdit(PropsEdit):
         self.combo_type.setModel(model)
         self.combo_type.setCurrentIndex(curr_index)
         self.combo_type.currentIndexChanged.connect(self.combo_type_changed)
-        layout.addWidget(QLabel('Barcode type:'))
-        layout.addWidget(self.combo_type)
+        self.layout.addWidget(QLabel('Barcode type:'))
+        self.layout.addWidget(self.combo_type)
 
         self.edit_text = QLineEdit(self.data.text, self)
         self.edit_text.textChanged.connect(self.edit_text_changed)
-        layout.addWidget(QLabel('Value:'))
-        layout.addWidget(self.edit_text)
+        self.layout.addWidget(QLabel('Value:'))
+        self.layout.addWidget(self.edit_text)
 
-        layout.addStretch()
-
-        self.setLayout(layout)
+        self.layout.addStretch()
 
     def combo_type_changed(self):
         model: QStandardItemModel = self.combo_type.model()
@@ -75,7 +72,6 @@ class BarcodeWriter(BaseWriter):
     def __init__(self):
         BaseWriter.__init__(self, self._init, self._create_module,
                             self._create_text, self._finish)
-
 
     def _init(self, code):
         print('init', code)
@@ -136,7 +132,9 @@ class BarcodeWriter(BaseWriter):
 
 
 class Barcode(Printable):
-    def __init__(self, data: BarcodeData):
+    def __init__(self, data: BarcodeData = None):
+        if data is None:
+            data = BarcodeData()
         self.data = data
 
     def get_name(self):

@@ -45,12 +45,15 @@ class LabelMaker:
 
     def __init__(self, logger, serial_device):
         self.log = logger
+        self.log('Opening serial device connection...')
         self.ser = serial.Serial(
             serial_device,
             baudrate=9600,
             stopbits=serial.STOPBITS_ONE,
             parity=serial.PARITY_NONE,
             bytesize=8,
+            timeout=10,
+            write_timeout=10,
             dsrdtr=True
         )
 
