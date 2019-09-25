@@ -1,8 +1,5 @@
-from copy import copy
-
-from PyQt5.QtCore import Qt, QMargins
-from PyQt5.QtGui import QFont, QImage, QPainter, QFontMetrics
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QLabel, QPushButton, QFontDialog, QSpinBox
+from PyQt5.QtGui import QImage
+from PyQt5.QtWidgets import QLabel, QSpinBox
 
 from labelmaker import USABLE_HEIGHT
 from margins import Margins
@@ -38,18 +35,22 @@ class SpacingPropsEdit(PropsEdit):
         self.edit_width.setValue(self.data.width)
         self.layout.addWidget(QLabel('Width:'))
         self.layout.addWidget(self.edit_width)
+        self.edit_width.valueChanged.connect(self.on_width_changed)
 
         self.layout.addStretch()
+
+    def on_width_changed(self):
+        self.save()
 
     def serialize(self):
         self.data.width = self.edit_width.value()
 
 
-
-
 class Spacing(Printable):
 
-    def __init__(self, data: SpacingData):
+    def __init__(self, data: SpacingData = None):
+        if data is None:
+            data = SpacingData()
         self.data = data
 
     def get_name(self):

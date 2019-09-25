@@ -9,7 +9,7 @@ from PyQt5.QtGui import QPixmap, QImage, QStandardItemModel, QPainter, QColor, Q
     QStandardItem, QFont, QKeySequence
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QFileDialog, QHBoxLayout, \
     QTreeView, QGroupBox, QInputDialog, QMessageBox, QMainWindow, QMenuBar, QAction, QComboBox, QFileSystemModel, QMenu, \
-    QButtonGroup, QDialog, QTextEdit, QScrollArea, QBoxLayout
+    QButtonGroup, QDialog, QTextEdit, QScrollArea, QBoxLayout, QSizePolicy
 
 from app import APP_NAME, APP_VERSION
 from labelmaker import LabelMaker, USABLE_HEIGHT, PRINT_MARGIN, BUFFER_HEIGHT
@@ -100,7 +100,7 @@ class PyTouchCubeGUI(QMainWindow):
         app.setApplicationDisplayName(APP_NAME)
 
 
-        self.preview_image = QLabel('No image selected')
+        self.preview_image = QLabel('No items to preview')
         self.preview_image.setFixedHeight(USABLE_HEIGHT)
 
         self.props_empty = False
@@ -200,10 +200,13 @@ class PyTouchCubeGUI(QMainWindow):
         preview_wrapper.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         preview_wrapper.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         preview_wrapper.setWidgetResizable(True)
+        preview_wrapper.setFixedHeight(USABLE_HEIGHT)
         layout.addWidget(preview_wrapper)
 
         # layout.addWidget(self.save_image_button)
         group.setLayout(layout)
+        group.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed))
+
         root.addWidget(group)
 
         self.printer_select = QComboBox(self)
@@ -498,7 +501,11 @@ class PyTouchCubeGUI(QMainWindow):
             row = current.row()
         self.items.insertRow(row, item.get_list_item())
         self.item_data.insert(row, item)
-        self.tree_view.setCurrentIndex(current)
+        if current.isValid():
+            self.tree_view.setCurrentIndex(current)
+        else:
+            self.tree_view.setCurrentIndex(self.items.createIndex(row, 0))
+        self.item_selected = row
         self.update_preview()
         self.update_props()
 

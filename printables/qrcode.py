@@ -1,5 +1,4 @@
 import math
-import sys
 
 import qrcode
 from PyQt5.QtGui import QImage, QPainter, QColor
@@ -56,7 +55,6 @@ class QrCode(Printable):
         qr.add_data(d.text)
         qr.make(fit=True)
 
-
         img = QImage(USABLE_HEIGHT, USABLE_HEIGHT, QImage.Format_ARGB32)
         img.fill(0xffffffff)
         with QPainter(img) as p:
@@ -71,8 +69,5 @@ class QrCode(Printable):
                 for c in range(modcount):
                     if qr.modules[r][c]:
                         p.fillRect(padding + (r*M), padding + (c*M), M, M, black)
-
-            # rect = img.rect().marginsRemoved(d.margins.getQMargins())
-            # p.drawRect(rect.adjusted(0,0,-1,-1))
 
         return img

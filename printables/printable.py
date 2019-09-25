@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt, QRect, QMargins
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QImage, QPainter, QColor, QIcon, QPixmap, QStandardItem
 from PyQt5.QtWidgets import QLabel, QAction
 

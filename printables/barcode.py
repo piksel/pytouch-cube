@@ -1,12 +1,11 @@
-from PyQt5.QtCore import Qt, QRectF, QStringListModel
-from PyQt5.QtGui import QFont, QFontMetrics, QImage, QPainter, QColor, QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QLabel, QComboBox
+import barcode
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QImage, QPainter, QColor, QStandardItemModel, QStandardItem
+from PyQt5.QtWidgets import QLineEdit, QLabel, QComboBox, QCheckBox
 from barcode.writer import BaseWriter
 
 from labelmaker import USABLE_HEIGHT
 from printables.printable import Printable, PrintableData
-import barcode
-
 from printables.propsedit import PropsEdit
 
 
@@ -14,13 +13,15 @@ class BarcodeData(PrintableData):
     def set_from(self, source):
         self.text = source.text
         self.code_type = source.code_type
+        self.draw_label = source.draw_label
 
     def clone(self):
-        return BarcodeData(self.text, self.code_type)
+        return BarcodeData(self.text, self.code_type, self.draw_label)
 
-    def __init__(self, text='123456789012', code_type='ean13'):
+    def __init__(self, text='123456789012', code_type='ean13', draw_label=False):
         self.text = text
         self.code_type = code_type
+        self.draw_label = draw_label
 
 
 class BarcodePropsEdit(PropsEdit):
@@ -49,6 +50,10 @@ class BarcodePropsEdit(PropsEdit):
         self.layout.addWidget(QLabel('Value:'))
         self.layout.addWidget(self.edit_text)
 
+        self.show_label = QCheckBox("Include label", self)
+        self.show_label.setChecked(self.data.draw_label)
+        self.layout.addWidget(self.show_label)
+
         self.layout.addStretch()
 
     def combo_type_changed(self):
@@ -59,8 +64,14 @@ class BarcodePropsEdit(PropsEdit):
         self.save()
         pass
 
+    def serialize(self, clone=False):
+        data = super().serialize(clone)
+
+        data.text = self.edit_text.text()
+        data.draw_label = self.show_label.isChecked()
+        return data
+
     def edit_text_changed(self):
-        self.data.text = self.edit_text.text()
         self.save()
 
 
@@ -69,9 +80,10 @@ class BarcodeWriter(BaseWriter):
     dpi = 15
     text_size = 20
 
-    def __init__(self):
+    def __init__(self, draw_label=False):
         BaseWriter.__init__(self, self._init, self._create_module,
                             self._create_text, self._finish)
+        self.draw_label = draw_label
 
     def _init(self, code):
         print('init', code)
@@ -99,7 +111,8 @@ class BarcodeWriter(BaseWriter):
         pass
 
     def _create_text(self, xpos, ypos):
-        return
+        if not self.draw_label:
+            return
         print('_create_text', xpos, ypos)
         if self.human != '':
             barcodetext = self.human
@@ -147,7 +160,7 @@ class Barcode(Printable):
     def render(self):
         d = self.data
 
-        writer = BarcodeWriter()
+        writer = BarcodeWriter(self.data.draw_label)
         self.render_error = None
         try:
             img = barcode.generate(d.code_type, d.text, writer, pil=True)
