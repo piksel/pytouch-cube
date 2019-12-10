@@ -42,8 +42,11 @@ class SpacingPropsEdit(PropsEdit):
     def on_width_changed(self):
         self.save()
 
-    def serialize(self):
-        self.data.width = self.edit_width.value()
+    def serialize(self, clone=False):
+        data = self.data
+        if clone:
+            data = SpacingData()
+        data.width = self.edit_width.value()
 
 
 class Spacing(Printable):

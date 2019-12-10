@@ -11,14 +11,16 @@ from printables.propsedit import PropsEdit
 
 class BarcodeData(PrintableData):
     def set_from(self, source):
+        super().set_from(source)
         self.text = source.text
         self.code_type = source.code_type
         self.draw_label = source.draw_label
 
     def clone(self):
-        return BarcodeData(self.text, self.code_type, self.draw_label)
+        return BarcodeData(self.margins, self.text, self.code_type, self.draw_label)
 
-    def __init__(self, text='123456789012', code_type='ean13', draw_label=False):
+    def __init__(self, margins=None, text='123456789012', code_type='ean13', draw_label=False):
+        super().__init__(margins)
         self.text = text
         self.code_type = code_type
         self.draw_label = draw_label
@@ -35,8 +37,8 @@ class BarcodePropsEdit(PropsEdit):
         curr_index = 0
         for key in barcode.PROVIDED_BARCODES:
             bc = barcode.get(key)
-            model.appendRow([QStandardItem(bc.name) ,QStandardItem(key)])
-            if self.data.code_type == key:
+            model.appendRow([QStandardItem(bc.name), QStandardItem(key)])
+            if data.code_type == key:
                 curr_index = model.rowCount() - 1
 
         self.combo_type.setModel(model)
@@ -45,13 +47,13 @@ class BarcodePropsEdit(PropsEdit):
         self.layout.addWidget(QLabel('Barcode type:'))
         self.layout.addWidget(self.combo_type)
 
-        self.edit_text = QLineEdit(self.data.text, self)
+        self.edit_text = QLineEdit(data.text, self)
         self.edit_text.textChanged.connect(self.edit_text_changed)
         self.layout.addWidget(QLabel('Value:'))
         self.layout.addWidget(self.edit_text)
 
         self.show_label = QCheckBox("Include label", self)
-        self.show_label.setChecked(self.data.draw_label)
+        self.show_label.setChecked(data.draw_label)
         self.layout.addWidget(self.show_label)
 
         self.layout.addStretch()
@@ -75,7 +77,6 @@ class BarcodePropsEdit(PropsEdit):
         self.save()
 
 
-
 class BarcodeWriter(BaseWriter):
     dpi = 15
     text_size = 20
@@ -94,13 +95,7 @@ class BarcodeWriter(BaseWriter):
         self._painter = QPainter(image)
         self._image = image
 
-        pass
-
-    first = True
-    def _create_module(self, xpos, ypos, width, color):
-        if self.first:
-            print('_create_module', xpos, ypos, width, color)
-            self.first = False
+    def _create_module(self, xpos, _ypos, width, color):
         p = self._painter
         p.setBrush(QColor(color))
         x1 = xpos * self.dpi
@@ -108,39 +103,34 @@ class BarcodeWriter(BaseWriter):
         x2 = width * self.dpi
         y2 = USABLE_HEIGHT
         p.drawRect(x1, y1, x2, y2)
-        pass
 
-    def _create_text(self, xpos, ypos):
+    def _create_text(self, _xpos, _ypos):
         if not self.draw_label:
             return
-        print('_create_text', xpos, ypos)
+
         if self.human != '':
-            barcodetext = self.human
+            barcode_text = self.human
         else:
-            barcodetext = self.text
+            barcode_text = self.text
         p = self._painter
 
         font = p.font()
         font.setPixelSize(self.text_size)
         p.setFont(font)
-        bounds = p.drawText(self._image.rect(), Qt.AlignBottom | Qt.AlignCenter, barcodetext)
+        bounds = p.drawText(self._image.rect(), Qt.AlignBottom | Qt.AlignCenter, barcode_text)
         p.setBrush(QColor(0xffffffff))
         pen = p.pen()
         p.setPen(Qt.NoPen)
         p.drawRect(bounds)
         p.setPen(pen)
 
-        bounds = p.drawText(self._image.rect(), Qt.AlignBottom | Qt.AlignCenter, barcodetext)
-
-        pass
+        p.drawText(self._image.rect(), Qt.AlignBottom | Qt.AlignCenter, barcode_text)
 
     def _finish(self):
         self._painter.end()
         return self._image
-        pass
 
     def save(self, filename, output):
-        print('save')
         pass
 
 

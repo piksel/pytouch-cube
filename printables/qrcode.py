@@ -55,7 +55,7 @@ class QrCode(Printable):
         qr.add_data(d.text)
         qr.make(fit=True)
 
-        img = QImage(USABLE_HEIGHT, USABLE_HEIGHT, QImage.Format_ARGB32)
+        img = QImage(USABLE_HEIGHT, USABLE_HEIGHT, QImage.Format_Mono)
         img.fill(0xffffffff)
         with QPainter(img) as p:
 

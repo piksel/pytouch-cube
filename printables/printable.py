@@ -6,10 +6,9 @@ from margins import Margins
 
 
 class PrintableData:
-
     margins = Margins()
 
-    def __init__(self, margins: Margins=None):
+    def __init__(self, margins: Margins = None):
         if margins is None:
             margins = Margins()
         self.margins = margins
@@ -22,7 +21,6 @@ class PrintableData:
 
 
 class Printable:
-
     render_error = None
 
     @classmethod
@@ -36,6 +34,7 @@ class Printable:
         def add():
             print('Add, class:', cls, 'parent:', parent)
             parent.add_item(cls())
+
         return add
 
     def get_render_error(self):

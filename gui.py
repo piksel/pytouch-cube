@@ -3,6 +3,7 @@ import datetime
 import os
 import pickle
 from enum import Enum, auto
+from pprint import pprint
 
 from PyQt5.QtCore import Qt, pyqtSignal, QDir, QModelIndex, QSortFilterProxyModel
 from PyQt5.QtGui import QPixmap, QImage, QStandardItemModel, QPainter, QColor, QDragEnterEvent, QDropEvent, \
@@ -217,12 +218,21 @@ class PyTouchCubeGUI(QMainWindow):
 
         potential_printer = None
         printers = QStandardItemModel()
-        for p in QDir('/dev').entryList(['tty*'], QDir.System, QDir.Name):
-            if p.startswith('tty.'):
-                item = QStandardItem('/dev/' + p)
-                printers.appendRow(item)
-                if p.startswith('tty.PT-P3'):
-                    potential_printer = item
+
+        #for p in QDir('/dev').entryList(['tty*'], QDir.System, QDir.Name):
+        #    if p.startswith('tty.'):
+        for p in LabelMaker.list_serial_ports():
+            # pprint(p.__dict__)
+            item = [QStandardItem(p.name), QStandardItem(p.device)]
+            print(p.name)
+            printers.appendRow(item)
+            '''
+            item = QStandardItem('/dev/' + p)
+            printers.appendRow(item)
+            if p.startswith('tty.PT-P3'):
+                potential_printer = item
+            '''
+
 
 
         #print(printers.entryList())
