@@ -320,7 +320,7 @@ class LabelMaker:
 
         self.log('Using serial device: ' + ser.name)
 
-        self.set_mode()
+        self.set_graphics_mode()
 
         self.inititialize();
 
@@ -333,7 +333,7 @@ class LabelMaker:
 
         self.inititialize()
 
-        self.set_mode(MODE_PTCBP)
+        self.set_graphics_mode(MODE_PTCBP)
 
         self.set_media_format(int(len(data) / 16), width=0xc0, length=0)
 
