@@ -153,7 +153,7 @@ class Barcode(Printable):
         writer = BarcodeWriter(self.data.draw_label)
         self.render_error = None
         try:
-            img = barcode.generate(d.code_type, d.text, writer, pil=True)
+            img = barcode.generate(d.code_type, d.text, writer)
         except Exception as x:
             self.render_error = x
             return QImage(0, 0, QImage.Format_ARGB32)

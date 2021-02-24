@@ -5,3 +5,5 @@ packbits
 pypng
 appdirs 
 pyyaml
+pillow
+qrcode

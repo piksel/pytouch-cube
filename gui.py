@@ -222,9 +222,9 @@ class PyTouchCubeGUI(QMainWindow):
         #for p in QDir('/dev').entryList(['tty*'], QDir.System, QDir.Name):
         #    if p.startswith('tty.'):
         for p in LabelMaker.list_serial_ports():
-            # pprint(p.__dict__)
-            item = [QStandardItem(p.name), QStandardItem(p.device)]
-            print(p.name)
+            pprint(p.__dict__)
+            # p.description
+            item = [QStandardItem(p.device), QStandardItem(p.device)]
             printers.appendRow(item)
             '''
             item = QStandardItem('/dev/' + p)
@@ -421,9 +421,10 @@ class PyTouchCubeGUI(QMainWindow):
             log_console.insertPlainText('\n' + fmt_log(message))
             log_console.ensureCursorVisible()
 
-        def done(exception):
+        def done(exception: Exception):
             if exception is not None:
                 log('Failed to print due to the following error:\n')
+                print(exception)
                 log_console.insertHtml('<pre style="color:red">{0}</pre>'.format(exception))
             else:
                 log('Printing completed without any errors!\n')
@@ -432,6 +433,8 @@ class PyTouchCubeGUI(QMainWindow):
         log_console.insertPlainText(fmt_log('Starting print thread...'))
 
         print_device = self.printer_select.currentText()
+        # print_device = self.printer_select.currentData(1)
+        print(print_device)
         self.print_thread = PrintThread(QImage(self.print_image), print_device)
         self.print_thread.log.connect(log)
         self.print_thread.done.connect(done)

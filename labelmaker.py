@@ -98,7 +98,7 @@ class Status:
 
         header = raw[:8]
         if header != b'\x80\x20B0J0\x00\x00':
-            self.parse_error = 'Header mismatch! Got ' + header
+            self.parse_error = 'Header mismatch! Got ' + str(header)
 
         self.error1 = raw[STATUS_OFFSET_ERROR_INFO_1]
         self.error2 = raw[STATUS_OFFSET_ERROR_INFO_2]
@@ -191,7 +191,7 @@ class LabelMaker:
         self.log("Query status...")
         self.ser.write(b"\x1b\x69\x53")
         raw = self.ser.read(size=32)
-        status = Status(raw)
+        return raw
 
 
     def print_status(self, raw: bytes):
@@ -324,8 +324,9 @@ class LabelMaker:
 
         self.inititialize();
 
-        status = self.query_status()
-        self.print_status(status)
+        status_raw = self.query_status()
+        status = Status(status_raw)
+        self.print_status(status_raw)
 
         self.log("Flushing print buffer...")
         for i in range(64):
