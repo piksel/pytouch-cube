@@ -416,8 +416,8 @@ class PyTouchCubeGUI(QMainWindow):
         modal_layout.addWidget(close)
 
         modal.setLayout(modal_layout)
-        modal.setFixedWidth(self.width() * .9)
-        modal.setFixedHeight(self.height() * .9)
+        modal.setFixedWidth(int(self.width() * .9))
+        modal.setFixedHeight(int(self.height() * .9))
         modal.open()
 
         def fmt_log(message):
