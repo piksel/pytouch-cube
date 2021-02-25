@@ -5,5 +5,5 @@ packbits
 pypng
 appdirs 
 pyyaml
-pillow
 qrcode
+py2exe

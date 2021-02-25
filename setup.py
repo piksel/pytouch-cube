@@ -8,9 +8,19 @@ Usage:
 from setuptools import setup
 
 import app
+import py2exe
+import site
+
+qt_plugin_root = site.getsitepackages()[1] + "\\PyQt5\\Qt\\plugins"
 
 APP = ['gui.py']
-DATA_FILES = []
+DATA_FILES = [
+    ('', ['pytouch3.png']),
+    ("platforms", [ qt_plugin_root + "\\platforms\\qwindows.dll"]),
+    ("iconengines", [qt_plugin_root + "\\iconengines\\qsvgicon.dll"]),
+    ("platformthemes", [qt_plugin_root + "\\platformthemes\\qxdgdesktopportal.dll"]),
+    ("styles", [qt_plugin_root + "\\styles\\qwindowsvistastyle.dll"])
+]
 OPTIONS = {'iconfile': 'pytouch3.icns'}
 
 setup(
@@ -19,6 +29,18 @@ setup(
     author=app.APP_AUTHOR,
     app=APP,
     data_files=DATA_FILES,
-    options={'py2app': OPTIONS},
-    setup_requires=['py2app'], install_requires=['PyQt5', 'django-qrcode', 'pyserial', 'packbits', 'pypng', 'appdirs']
+    options={'py2app': OPTIONS, 'py2exe': {
+        'includes': [
+            'PyQt5.sip',
+            'PyQt5.QtCore',
+            'PyQt5.QtGui'
+        ]
+    }},
+    windows=[{
+        "script": APP[0],
+        "icon_resources": [(0, "pytouch3.ico")],
+        "dest_base": "pytouch3"
+    }],
+    setup_requires=['py2app', 'py2exe'],
+    install_requires=['PyQt5', 'django-qrcode', 'pyserial', 'packbits', 'pypng', 'appdirs']
 )

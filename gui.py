@@ -7,7 +7,7 @@ from pprint import pprint
 
 from PyQt5.QtCore import Qt, pyqtSignal, QDir, QModelIndex, QSortFilterProxyModel
 from PyQt5.QtGui import QPixmap, QImage, QStandardItemModel, QPainter, QColor, QDragEnterEvent, QDropEvent, \
-    QStandardItem, QFont, QKeySequence
+    QStandardItem, QFont, QKeySequence, QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QFileDialog, QHBoxLayout, \
     QTreeView, QGroupBox, QInputDialog, QMessageBox, QMainWindow, QMenuBar, QAction, QComboBox, QFileSystemModel, QMenu, \
     QButtonGroup, QDialog, QTextEdit, QScrollArea, QBoxLayout, QSizePolicy
@@ -24,6 +24,17 @@ from printables.qrcode import QrCode
 from printables.spacing import Spacing, SpacingData
 from printables.text import TextData, Text
 from settings import Settings
+
+if os.name == 'nt':
+    is_win = True
+    is_linux = False
+    is_mac = False
+else:
+    import sys
+    is_win = False
+    plat = sys.platform.lower()
+    is_mac = plat[:6] == 'darwin'
+    is_linux = not is_mac
 
 
 class ModelCol(Enum):
@@ -47,7 +58,6 @@ class ItemType(Enum):
 
 
 class ItemView(QTreeView):
-
     rowMoved = pyqtSignal(int, int, name='rowMoved')
 
     def itemFromIndex(self, index):
@@ -75,6 +85,7 @@ class ItemView(QTreeView):
 
         self.rowMoved.emit(old_row, new_row)
 
+
 def make_props_empty(parent):
     print('####################### CREATING EMPTY ######################')
     widget = QLabel('No item selected', parent)
@@ -83,7 +94,6 @@ def make_props_empty(parent):
 
 
 class PyTouchCubeGUI(QMainWindow):
-
     item_selected = None
     props_current = None
     printer_select = None
@@ -95,17 +105,16 @@ class PyTouchCubeGUI(QMainWindow):
         Settings.load()
 
         self.setWindowTitle(APP_NAME)
+        self.setWindowIcon(QIcon('pytouch3.png'))
 
         self.app = app
         app.setApplicationName(APP_NAME)
         app.setApplicationDisplayName(APP_NAME)
 
-
         self.preview_image = QLabel('No items to preview')
         self.preview_image.setFixedHeight(USABLE_HEIGHT)
 
         self.props_empty = False
-
 
         self.save_image_button = QPushButton('Save image')
         self.save_image_button.setDisabled(True)
@@ -122,8 +131,6 @@ class PyTouchCubeGUI(QMainWindow):
         self.tree_view.setDragDropMode(QTreeView.InternalMove)
         self.tree_view.setItemsExpandable(False)
         self.tree_view.setDragDropOverwriteMode(False)
-
-
 
         root = QVBoxLayout()
 
@@ -147,8 +154,8 @@ class PyTouchCubeGUI(QMainWindow):
         add_button.setMenu(add_menu)
         buttons.addWidget(add_button)
 
-        #buttons.addWidget(add_text_button)
-        #buttons.addWidget(add_barcode_button)
+        # buttons.addWidget(add_text_button)
+        # buttons.addWidget(add_barcode_button)
         buttons.addStretch()
         buttons.setSpacing(1)
 
@@ -162,14 +169,12 @@ class PyTouchCubeGUI(QMainWindow):
         b_clone = QPushButton('Copy')
         b_clone.clicked.connect(self.on_clone)
 
-
         buttons.addWidget(b_clone)
         buttons.addSpacing(10)
         buttons.addWidget(b_up)
         buttons.addWidget(b_down)
         buttons.addSpacing(10)
         buttons.addWidget(b_delete)
-
 
         layout.addLayout(buttons)
         group.setLayout(layout)
@@ -196,7 +201,7 @@ class PyTouchCubeGUI(QMainWindow):
 
         preview_wrapper = QScrollArea(self)
 
-        #prev_layout = QHBoxLayout()
+        # prev_layout = QHBoxLayout()
         preview_wrapper.setWidget(self.preview_image)
         preview_wrapper.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         preview_wrapper.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -212,14 +217,14 @@ class PyTouchCubeGUI(QMainWindow):
 
         self.printer_select = QComboBox(self)
         fs_model = QFileSystemModel(self)
-        #model_proxy = QSortFilterProxyModel(self)
-        #model_proxy.setSourceModel(fs_model)
+        # model_proxy = QSortFilterProxyModel(self)
+        # model_proxy.setSourceModel(fs_model)
         # fs_model.setNameFilters(['tty.PT-P3*'])
 
         potential_printer = None
         printers = QStandardItemModel()
 
-        #for p in QDir('/dev').entryList(['tty*'], QDir.System, QDir.Name):
+        # for p in QDir('/dev').entryList(['tty*'], QDir.System, QDir.Name):
         #    if p.startswith('tty.'):
         for p in LabelMaker.list_serial_ports():
             pprint(p.__dict__)
@@ -233,32 +238,26 @@ class PyTouchCubeGUI(QMainWindow):
                 potential_printer = item
             '''
 
+        # print(printers.entryList())
 
+        # model_proxy.setRecursiveFilteringEnabled(True)
+        # model_proxy.setFilterKeyColumn(0)
 
-        #print(printers.entryList())
-
-
-        #model_proxy.setRecursiveFilteringEnabled(True)
-        #model_proxy.setFilterKeyColumn(0)
-
-        fs_model.setRootPath('/dev/')#/Users/nilsmasen')
-        fs_model.setFilter( QDir.System  )
+        fs_model.setRootPath('/dev/')  # /Users/nilsmasen')
+        fs_model.setFilter(QDir.System)
 
         dev_index = fs_model.index('/dev')
-        #proxy_dev = model_proxy.mapFromSource(dev_index)
-
-
+        # proxy_dev = model_proxy.mapFromSource(dev_index)
 
         self.printer_select.setModel(printers)
 
         if potential_printer is not None:
             index = printers.indexFromItem(potential_printer)
             self.printer_select.setCurrentIndex(index.row())
-        #printer_select.setRootModelIndex(dev_index)
-        #printer_select.setRootIndex(dev_index)
-        #printer_select.setExpanded(dev_index, True)
-        #model_proxy.setFilterWildcard('tty*')
-
+        # printer_select.setRootModelIndex(dev_index)
+        # printer_select.setRootIndex(dev_index)
+        # printer_select.setExpanded(dev_index, True)
+        # model_proxy.setFilterWildcard('tty*')
 
         bottom_box = QGroupBox('Print label: ')
         bottom_bar = QHBoxLayout()
@@ -281,15 +280,17 @@ class PyTouchCubeGUI(QMainWindow):
         menu = QMenuBar()
         self.setMenuBar(menu)
 
-        menu.setWindowTitle(APP_NAME)
-        tools_menu = menu.addMenu('Python')
-        prefs = QAction('&Preferences', self)
-        prefs.triggered.connect(self.on_prefs)
-        tools_menu.addAction(prefs)
         about = QAction('About ' + APP_NAME, self)
-        about.triggered.connect(self.on_prefs)
+        about.triggered.connect(self.on_about)
         about.setMenuRole(QAction.AboutRole)
-        tools_menu.addAction(about)
+
+        if is_mac:
+            menu.setWindowTitle(APP_NAME)
+            tools_menu = menu.addMenu(APP_NAME)
+            prefs = QAction('&Preferences', self)
+            prefs.triggered.connect(self.on_prefs)
+            tools_menu.addAction(prefs)
+            tools_menu.addAction(about)
 
         file_menu = menu.addMenu('Label')
         act_new = QAction('&New', self)
@@ -312,6 +313,10 @@ class PyTouchCubeGUI(QMainWindow):
         file_menu.addSeparator()
         file_menu.addAction(QAction('&Export image', self))
 
+        if not is_mac:
+            help_menu = menu.addMenu('Help')
+            help_menu.addAction(about)
+
         # menu.setNativeMenuBar(False)
 
     def on_new(self):
@@ -320,19 +325,22 @@ class PyTouchCubeGUI(QMainWindow):
         self.update_items()
         self.update_preview()
 
-    def on_prefs(self):
+    def on_about(self):
         QMessageBox.information(self,
                                 "Info",
-                                "{0} v{1}\n\nhttps://github.com/piksel/pytouch-cube".format(APP_NAME, APP_VERSION))
+                                f"{APP_NAME} v{APP_VERSION}\n\nhttps://github.com/piksel/pytouch-cube")
+
+    def on_prefs(self):
+        QMessageBox.information(self, "Info", "Not implemented")
 
     def run(self):
 
         self.show()
-        #self.add_item(Text(TextData('foo')))
-        #self.add_item(Text(TextData('Bar1')))
-        #self.add_item(Text(TextData('Bar2')))
-        #self.add_item(Spacing(SpacingData(10)))
-        #self.add_item(Text(TextData('baz')))
+        # self.add_item(Text(TextData('foo')))
+        # self.add_item(Text(TextData('Bar1')))
+        # self.add_item(Text(TextData('Bar2')))
+        # self.add_item(Spacing(SpacingData(10)))
+        # self.add_item(Text(TextData('baz')))
         # self.add_item(Barcode(BarcodeData('123456789012')))
         # self.add_item(Barcode(BarcodeData('ACE222', 'code128')))
 
@@ -378,7 +386,6 @@ class PyTouchCubeGUI(QMainWindow):
         self.current_file = file_path
         self.open()
 
-
     def save(self):
         with open(self.current_file, 'wb') as file:
             pickler = pickle.Pickler(file)
@@ -410,7 +417,7 @@ class PyTouchCubeGUI(QMainWindow):
 
         modal.setLayout(modal_layout)
         modal.setFixedWidth(self.width() * .9)
-        modal.setFixedHeight(self.height()*.9)
+        modal.setFixedHeight(self.height() * .9)
         modal.open()
 
         def fmt_log(message):

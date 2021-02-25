@@ -8,15 +8,15 @@ import xml.dom
 
 from barcode import __release__
 
-try:
-    import Image, ImageDraw, ImageFont
-except ImportError:
-    try:
-        from PIL import Image, ImageDraw, ImageFont  # lint:ok
-    except ImportError:
-        import sys
-        sys.stderr.write('PIL not found. Image output disabled.\n\n')
-        Image = ImageDraw = ImageFont = None  # lint:ok
+# try:
+#     import Image, ImageDraw, ImageFont
+# except ImportError:
+#     try:
+#         from PIL import Image, ImageDraw, ImageFont  # lint:ok
+#     except ImportError:
+#         import sys
+#         sys.stderr.write('PIL not found. Image output disabled.\n\n')
+Image = ImageDraw = ImageFont = None  # lint:ok
 
 
 def mm2px(mm, dpi=300):
