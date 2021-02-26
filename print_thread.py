@@ -1,6 +1,11 @@
+import logging
+import traceback
+
 from PyQt5.QtCore import QThread, pyqtSignal
 
 from labelmaker import LabelMaker, BUFFER_HEIGHT, PRINT_MARGIN
+
+log = logging.getLogger(__name__)
 
 
 class PrintThread(QThread):
@@ -17,7 +22,7 @@ class PrintThread(QThread):
         try:
             buf = bytearray()
 
-            self.log.emit('Building bit map from image...')
+            log.info('Building bit map from image...')
 
             # State for bit packing
             bit_cursor = 8
@@ -45,14 +50,15 @@ class PrintThread(QThread):
                         bit_cursor = 8
 
                 # print()
-            self.log.emit('Printing label, width: {0} height: {1}'.format(self.print_image.width(), self.print_image.height()))
+            log.info(
+                'Printing label, width: {0} height: {1}'.format(self.print_image.width(), self.print_image.height()))
 
-            lm = LabelMaker(lambda s: self.log.emit(s), self.print_device)
-            print('wat2')
-            lm.print_label(buf)
-            print('wat3')
+            # lm = LabelMaker(self.print_device)
+            # lm.print_label(buf)
+            self.print_device.test()
             self.done.emit(None)
         except Exception as x:
             self.done.emit(x)
 
+            traceback.print_exc()
         print('wat4')

@@ -77,7 +77,10 @@ class Printable:
     def get_icon(self) -> QIcon:
         return self.__class__.get_generic_icon()
 
+    def get_type(self):
+        return self.__class__.__name__
+
     def get_list_item(self):
         name = self.get_name()
         icon = self.get_icon()
-        return QStandardItem(icon, self.__class__.__name__), QStandardItem(name)
+        return QStandardItem(icon, self.get_type()), QStandardItem(name)

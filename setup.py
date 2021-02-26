@@ -6,41 +6,62 @@ Usage:
 """
 
 from setuptools import setup
-
+from util import *
 import app
 import py2exe
 import site
 
 qt_plugin_root = site.getsitepackages()[1] + "\\PyQt5\\Qt\\plugins"
 
-APP = ['gui.py']
+APP = 'pytouch3.py'
 DATA_FILES = [
     ('', ['pytouch3.png']),
-    ("platforms", [ qt_plugin_root + "\\platforms\\qwindows.dll"]),
-    ("iconengines", [qt_plugin_root + "\\iconengines\\qsvgicon.dll"]),
-    ("platformthemes", [qt_plugin_root + "\\platformthemes\\qxdgdesktopportal.dll"]),
-    ("styles", [qt_plugin_root + "\\styles\\qwindowsvistastyle.dll"])
 ]
-OPTIONS = {'iconfile': 'pytouch3.icns'}
+
+if is_mac:
+    SETUP_KW = {
+        "setup_requires": ['py2app', 'py2exe'],
+    }
+elif is_win:
+    SETUP_KW = {
+        "windows": [{
+            "script": APP[0],
+            "icon_resources": [(0, "pytouch3.ico")],
+            "dest_base": "pytouch3"
+        }],
+        "setup_requires": ['py2app', 'py2exe'],
+    }
+    DATA_FILES += [
+        ("platforms", [ qt_plugin_root + "\\platforms\\qwindows.dll"]),
+        ("iconengines", [qt_plugin_root + "\\iconengines\\qsvgicon.dll"]),
+        ("platformthemes", [qt_plugin_root + "\\platformthemes\\qxdgdesktopportal.dll"]),
+        ("styles", [qt_plugin_root + "\\styles\\qwindowsvistastyle.dll"])
+    ]
+else:
+    SETUP_KW = {
+        "setup_requires": ['py2app', 'py2exe'],
+    }
 
 setup(
     name=app.APP_NAME,
     version=app.APP_VERSION,
     author=app.APP_AUTHOR,
-    app=APP,
+    app=[APP],
     data_files=DATA_FILES,
-    options={'py2app': OPTIONS, 'py2exe': {
-        'includes': [
-            'PyQt5.sip',
-            'PyQt5.QtCore',
-            'PyQt5.QtGui'
-        ]
-    }},
-    windows=[{
-        "script": APP[0],
-        "icon_resources": [(0, "pytouch3.ico")],
-        "dest_base": "pytouch3"
-    }],
+    options={
+        'py2app': {
+            'iconfile': 'pytouch3.icns'
+        },
+        'py2exe': {
+            'includes': [
+                'PyQt5.sip',
+                'PyQt5.QtCore',
+                'PyQt5.QtGui'
+            ]
+        }
+    },
+
     setup_requires=['py2app', 'py2exe'],
-    install_requires=['PyQt5', 'django-qrcode', 'pyserial', 'packbits', 'pypng', 'appdirs']
+    install_requires=['PyQt5', 'django-qrcode', 'pyserial', 'packbits', 'pypng', 'appdirs'],
+    **SETUP_KW
 )

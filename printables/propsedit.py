@@ -41,5 +41,5 @@ class PropsEdit(QWidget):
         self.serialize()
         self.data_original.set_from(self.data)
         self.printable.data = self.data
+        self.parent.update_current_item()
         self.parent.update_preview()
-        self.parent.update_items(True)

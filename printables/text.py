@@ -44,7 +44,8 @@ class TextData(PrintableData):
         self.font_string = source.font_string
 
     def __str__(self):
-        return '<TextData [{0}] "{1}" {2} {3} {4} {5}>'.format(self.font_string, self.text, self.margins.top(), self.margins.left(), self.margins.right(), self.margins.bottom())
+        m = self.margins
+        return f'<TextData [{self.font_string}] "{self.text}" {m.top} {m.left} {m.right} {m.bottom}>'
 
 
 class TextPropsEdit(PropsEdit):

@@ -5,10 +5,13 @@ import struct
 # "Raster graphics transfer" serial command
 TRANSFER_COMMAND = 0x47
 
-unsigned_char = struct.Struct('B');
+unsigned_char = struct.Struct('B')
+
+
 def as_unsigned_char(byte):
     """ Interpret a byte as an unsigned int """
     return unsigned_char.unpack(byte)[0]
+
 
 def encode_raster_transfer(data):
     """ Encode 1 bit per pixel image data for transfer over serial to the printer """
@@ -19,7 +22,7 @@ def encode_raster_transfer(data):
     chunk_size = 16
 
     for i in range(0, len(data), chunk_size):
-        chunk = data[i : i + chunk_size]
+        chunk = data[i: i + chunk_size]
 
         # Encode as tiff
         packed_chunk = packbits.encode(chunk)
@@ -29,13 +32,14 @@ def encode_raster_transfer(data):
 
         # Write number of bytes to transfer (n1 + n2*256)
         length = len(packed_chunk)
-        buf.append( int(length % 256) )
-        buf.append( int(length / 256) )
+        buf.append(int(length % 256))
+        buf.append(int(length / 256))
 
         # Write data
         buf.extend(packed_chunk)
 
     return buf
+
 
 def decode_raster_transfer(data):
     """ Read data encoded as T encoded as TIFF with transfer headers """
@@ -46,16 +50,16 @@ def decode_raster_transfer(data):
     while i < len(data):
         if data[i] == TRANSFER_COMMAND:
             # Decode number of bytes to transfer
-            n1 = as_unsigned_char(data[i+1])
-            n2 = as_unsigned_char(data[i+2])
-            num_bytes = n1 + n2*256
+            n1 = as_unsigned_char(data[i + 1])
+            n2 = as_unsigned_char(data[i + 2])
+            num_bytes = n1 + n2 * 256
 
             # Copy contents of transfer to output buffer
-            transferedData = data[i + 3 : i + 3 + num_bytes]
-            buf.extend(transferedData)
+            transferred_data = data[i + 3: i + 3 + num_bytes]
+            buf.extend(transferred_data)
 
             # Confirm
-            if len(transferedData) != num_bytes:
+            if len(transferred_data) != num_bytes:
                 raise Exception("Failed to read %d bytes at index %s: end of input data reached." % (num_bytes, i))
 
             # Shift to the next position after these command and data bytes
@@ -65,6 +69,7 @@ def decode_raster_transfer(data):
             raise Exception("Unexpected byte %s" % data[i])
 
     return buf
+
 
 def read_png(path):
     """ Read a (monochrome) PNG image and convert to 1bpp raw data
@@ -92,7 +97,7 @@ def read_png(path):
                 byte |= (1 << bit_cursor)
 
             if bit_cursor == 0:
-                buf.append(unsigned_char.pack(byte))
+                buf.append(unsigned_char.pack(byte)[0])
                 byte = 0
                 bit_cursor = 8
 
