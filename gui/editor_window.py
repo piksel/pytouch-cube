@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 
 
 def make_props_empty(parent):
-    print('####################### CREATING EMPTY ######################')
+    log.debug('Creating empty props view')
     widget = QLabel('No item selected', parent)
     widget.setMinimumWidth(128)
     return widget
@@ -110,7 +110,7 @@ class PyTouchCubeGUI(QMainWindow):
 
         # prev_layout = QHBoxLayout()
 
-        preview_container.setContentsMargins(0,0,0,0)
+        preview_container.setContentsMargins(0, 0, 0, 0)
         preview_container.setFixedHeight(USABLE_HEIGHT)
         preview_wrapper.setContentsMargins(0, 0, 0, 0)
 
@@ -142,7 +142,7 @@ class PyTouchCubeGUI(QMainWindow):
         root.addWidget(bottom_box)
 
         root_widget = QWidget()
-        #root_widget.setFixedWidth(800)
+        # root_widget.setFixedWidth(800)
         root_widget.setLayout(root)
         self.setCentralWidget(root_widget)
         menu = TopMenu(self)
@@ -270,7 +270,7 @@ class PyTouchCubeGUI(QMainWindow):
         print_device = self.printer_select.currentData()
 
         # print_device = self.printer_select.currentData(1)
-        print(print_device)
+        log.debug(f'Using device: {print_device}')
         self.print_thread = PrintThread(QImage(self.print_image), print_device)
         # self.print_thread.log.connect(log)
         self.print_thread.done.connect(done)
@@ -330,6 +330,3 @@ class PyTouchCubeGUI(QMainWindow):
         self.props_layout.replaceWidget(self.props_current, new_widget)
         self.props_current.close()
         self.props_current = new_widget
-
-
-
