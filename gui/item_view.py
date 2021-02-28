@@ -3,7 +3,7 @@ from PyQt5.QtGui import QDragEnterEvent, QDropEvent, QStandardItemModel
 from PyQt5.QtWidgets import QTreeView, QWidget, QTableView, QAbstractItemView, QHeaderView
 from typing import *
 
-from .types import PrintablesModel
+from .printables_model import PrintablesModel
 
 
 class ItemView(QTableView):
@@ -28,7 +28,7 @@ class ItemView(QTableView):
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         self.setDragDropOverwriteMode(False)
-        # self.verticalHeader().hide()
+        self.verticalHeader().hide()
         self.setEditTriggers(QAbstractItemView.DoubleClicked)
         # self.setDragDropMode(QAbstractItemView.InternalMove)
         self.setDragDropMode(QAbstractItemView.InternalMove)
@@ -42,7 +42,6 @@ class ItemView(QTableView):
         return self.model().data(index)
 
     def dragEnterEvent(self, e: QDragEnterEvent) -> None:
-        print('DRAAAAAAAAAAG')
         self.draggedItem = self.indexAt(e.pos())
         e.setDropAction(Qt.MoveAction)
         super().dragEnterEvent(e)

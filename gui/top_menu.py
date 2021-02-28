@@ -42,7 +42,11 @@ class TopMenu(QMenuBar):
         label_save_as.setShortcut(QKeySequence("Ctrl+Shift+S"))
         file_menu.addAction(label_save_as)
         file_menu.addSeparator()
-        file_menu.addAction(QAction('&Export image', self))
+        label_export = QAction('&Export image', self)
+        file_menu.addAction(label_export)
+        file_menu.addSeparator()
+        self.quit = QAction('Exit')
+        file_menu.addAction(self.quit)
 
         if not is_mac:
             help_menu = self.addMenu('Help')
@@ -54,3 +58,4 @@ class TopMenu(QMenuBar):
         self.label_open = label_open
         self.label_save = label_save
         self.label_save_as = label_save_as
+        self.label_export = label_export

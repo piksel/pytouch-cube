@@ -140,6 +140,9 @@ class Barcode(Printable):
             data = BarcodeData()
         self.data = data
 
+    def get_margins(self):
+        return self.data.margins
+
     def get_name(self):
         bc = barcode.get(self.data.code_type).name
         return "[{0}] {1}".format(bc, self.data.text)

@@ -1,3 +1,4 @@
+import logging
 from copy import copy
 
 from PyQt5.QtCore import Qt, QMargins
@@ -10,6 +11,8 @@ from margins import Margins
 from printables.printable import Printable, PrintableData
 from printables.propsedit import PropsEdit
 from settings import Settings
+
+log = logging.getLogger(__name__)
 
 
 class TextData(PrintableData):
@@ -24,7 +27,7 @@ class TextData(PrintableData):
             font.setFamily('Helvetica Neue')
 
             # font.Helvetica
-            print('Default font:', font.family(), font.families(), font.toString())
+            log.debug(f'Default font: {font.family()} {font.families()}, {font.toString()}')
             font.setPixelSize(USABLE_HEIGHT)
             self.font_string = font.toString()
         else:
@@ -49,7 +52,6 @@ class TextData(PrintableData):
 
 
 class TextPropsEdit(PropsEdit):
-
     data: TextData
     adjusted_size = None
 
@@ -167,11 +169,11 @@ class TextPropsEdit(PropsEdit):
             font.setPixelSize(font_size)
             metrics = QFontMetrics(font)
             rect = metrics.boundingRect(self.edit_text.text())
-            print('Font:', font.family())
-            print('Height:', rect.height(), rect.top(), '<->', rect.bottom(), 'CapHeight:', metrics.capHeight(),
-                  'Ascent:', metrics.ascent(), 'FontSize:', font_size)
+            log.debug(f'Font: {font.family()}')
+            log.debug(f'Height: {rect.height()}, {rect.top()} <-> {rect.bottom()}, CapHeight: {metrics.capHeight()}')
+            log.debug(f'Ascent: {metrics.ascent()}, FontSize: {font_size}')
             over_ascent = metrics.ascent() - font_size
-            print('OverAscent:', over_ascent)
+            log.debug(f'OverAscent: {over_ascent}')
             adjusted_size = font_size - over_ascent
             self.adjusted_size = adjusted_size
             self.adjusted_size_label.setText('Adjusted size: {0}px'.format(adjusted_size))
@@ -197,6 +199,9 @@ class Text(Printable):
 
         self.data = data
 
+    def get_margins(self):
+        return self.data.margins
+
     def get_name(self):
         return self.data.text
 
@@ -208,12 +213,12 @@ class Text(Printable):
         font = QFont()
         font.fromString(d.font_string)
         width = QFontMetrics(font).width(d.text)
-        print(width, font.toString(), d.text)
+        log.debug(f'Width: {width}, Font: {font}, Text: {d.text}')
         img = QImage(width, USABLE_HEIGHT, QImage.Format_ARGB32)
         img.fill(0xffffffff)
         p = QPainter(img)
         p.setFont(font)
-        rect = img.rect().marginsRemoved(d.margins.getQMargins())
+        rect = img.rect() # .marginsRemoved(d.margins.getQMargins())
         p.drawText(rect, Qt.AlignLeft | Qt.AlignHCenter, d.text)
         p.end()
         del p

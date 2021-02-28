@@ -1,6 +1,6 @@
 from pprint import pprint
 
-from PyQt5.QtCore import QDir
+from PyQt5.QtCore import QDir, Qt
 from PyQt5.QtWidgets import QComboBox
 from qasync import asyncSlot
 

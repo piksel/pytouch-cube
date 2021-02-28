@@ -1,9 +1,13 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QImage, QPainter, QColor, QIcon, QPixmap, QStandardItem
+import abc
+from typing import Optional
+import logging
+from PyQt5.QtCore import Qt, QLineF, QPointF
+from PyQt5.QtGui import QImage, QPainter, QColor, QIcon, QPixmap, QStandardItem, QPainterPath
 from PyQt5.QtWidgets import QLabel, QAction
 
 from margins import Margins
 
+log = logging.getLogger(__name__)
 
 class PrintableData:
     margins = Margins()
@@ -20,8 +24,8 @@ class PrintableData:
         self.margins = source.margins.clone()
 
 
-class Printable:
-    render_error = None
+class Printable(abc.ABC):
+    render_error: Optional[Exception] = None
 
     @classmethod
     def get_add_add_action(cls, parent):
@@ -32,7 +36,7 @@ class Printable:
     @classmethod
     def add_new(cls, parent):
         def add():
-            print('Add, class:', cls, 'parent:', parent)
+            log.debug(f'Adding new "{cls.__name__}" printable')
             parent.add_item(cls())
 
         return add
@@ -47,8 +51,12 @@ class Printable:
     def get_name(self):
         return hex(self.__hash__() & ((1 << 32) - 1))
 
-    def render(self):
+    @abc.abstractmethod
+    def render(self) -> QImage:
         raise NotImplementedError
+
+    def get_margins(self):
+        return Margins(0, 0, 0, 1)
 
     def get_props_editor(self, parent):
         widget = QLabel('Item props cannot be edited', parent)
@@ -56,12 +64,12 @@ class Printable:
         return widget
 
     @classmethod
-    def get_generic_icon(cls) -> QIcon:
+    def get_generic_icon(cls, valid: bool = True) -> QIcon:
         img = QImage(32, 32, QImage.Format_ARGB32)
         img.fill(QColor(200, 200, 200))
         with QPainter(img) as p:
             pen = p.pen()
-            pen.setColor(QColor(0, 0, 0))
+            pen.setColor(QColor(0, 0, 0) if valid else QColor(255, 0, 0))
             p.setPen(pen)
 
             p.drawRect(1, 1, 30, 30)
@@ -71,6 +79,32 @@ class Printable:
             p.setFont(font)
 
             p.drawText(img.rect(), Qt.AlignCenter, cls.get_letter())
+
+        return QIcon(QPixmap.fromImage(img))
+
+    @classmethod
+    def get_error_icon(cls) -> QIcon:
+        img = QImage(32, 32, QImage.Format_ARGB32)
+        img.fill(Qt.white)
+        with QPainter(img) as p:
+            pen = p.pen()
+            pen.setColor(QColor(0, 0, 0))
+            p.setPen(pen)
+
+            mn, md, mx = 1, 15.5, 30
+            triangle = QPainterPath(QPointF(mn, mx))
+            triangle.lineTo(QPointF(md, mn))
+            triangle.lineTo(QPointF(mx, mx))
+            triangle.lineTo(QPointF(mn, mx))
+
+            p.fillPath(triangle, QColor(255, 197, 74))
+            p.drawPath(triangle)
+
+            font = p.font()
+            font.setPixelSize(26)
+            p.setFont(font)
+
+            p.drawText(img.rect(), Qt.AlignCenter, '!')
 
         return QIcon(QPixmap.fromImage(img))
 

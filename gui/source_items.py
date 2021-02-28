@@ -1,10 +1,13 @@
+import logging
+
 from PyQt5.QtCore import pyqtSignal, QModelIndex
 from PyQt5.QtWidgets import QGroupBox, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QMenu
 
 from printables.printable import Printable
-from .types import PrintablesModel
 from .item_view import ItemView
 from printables import Barcode, Image, QrCode, Spacing, Text
+
+log = logging.getLogger(__name__)
 
 
 class SourceItems(QGroupBox):
@@ -14,15 +17,15 @@ class SourceItems(QGroupBox):
     def __init__(self, parent: QWidget):
         super().__init__('Source items:', parent)
 
-        self.tree_view = ItemView(self)
-        self.items = self.tree_view.items
+        self.table = ItemView(self)
+        self.items = self.table.items
         self.items.rowsMoved.connect(self.tree_view_reorder)
 
-        self.tree_view.clicked.connect(self.tree_view_clicked)
-        self.tree_view.rowMoved.connect(self.tree_view_reorder)
+        self.table.clicked.connect(self.tree_view_clicked)
+        self.table.rowMoved.connect(self.tree_view_reorder)
 
         layout = QVBoxLayout()
-        layout.addWidget(self.tree_view)
+        layout.addWidget(self.table)
         buttons = QHBoxLayout()
 
         add_menu = QMenu(self)
@@ -43,9 +46,11 @@ class SourceItems(QGroupBox):
         buttons.addStretch()
         buttons.setSpacing(1)
 
-        b_down = QPushButton('⬇︎')
+        b_down = QPushButton('Move down')
+        # b_down = QPushButton('⬇︎')
         b_down.clicked.connect(lambda _: self.move_item(1))
-        b_up = QPushButton('⬆︎')
+        b_up = QPushButton('Move up')
+        # b_up = QPushButton('⬆︎')
         b_up.clicked.connect(lambda _: self.move_item(-1))
         b_delete = QPushButton('Delete')
         b_delete.clicked.connect(self.delete_item)
@@ -65,24 +70,24 @@ class SourceItems(QGroupBox):
 
     def add_item(self, item: Printable):
         self.items.add(item)
-        self.tree_view.selectRow(len(self.items.items) - 1)
+        self.table.selectRow(len(self.items.items) - 1)
         self.item_selected.emit(item)
         self.items_changed.emit()
 
     def move_item(self, direction):
 
-        current = self.tree_view.currentIndex()
+        current = self.table.currentIndex()
         old = current.row()
         new = current.row() + direction
         if new < 0 or new >= self.items.rowCount():
-            print('cannot move from', old, 'to', new)
+            log.warning('cannot move from', old, 'to', new)
             return
-        print(f'Moving {old} to {new}')
+        log.debug(f'Moving {old} to {new}')
         if not self.items.moveRow(QModelIndex(), old, QModelIndex(), new):
-            print('Failed to move row')
+            log.warning('Failed to move row')
 
     def on_clone(self):
-        current = self.tree_view.currentIndex()
+        current = self.table.currentIndex()
         if not current.isValid() or current.row() < 0:
             return
         original = current.internalPointer()
@@ -90,15 +95,13 @@ class SourceItems(QGroupBox):
         self.add_item(copy)
 
     def delete_item(self):
-        current = self.tree_view.currentIndex()
+        current = self.table.currentIndex()
         if not current.isValid() or current.row() < 0:
             return
         self.items.removeRow(current.row())
         self.items_changed.emit()
 
-
     def tree_view_reorder(self, old, new):
-        print('REORDERED')
         self.items_changed.emit()
 
     def tree_view_clicked(self, index):
@@ -110,5 +113,5 @@ class SourceItems(QGroupBox):
         self.item_selected.emit(item)
 
     def update_current_item(self):
-        index = self.tree_view.currentIndex()
+        index = self.table.currentIndex()
         self.items.dataChanged.emit(index, index)

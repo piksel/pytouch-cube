@@ -40,6 +40,9 @@ class QrCode(Printable):
         super().__init__()
         self.data = QrCodeData()
 
+    def get_margins(self):
+        return self.data.margins
+
     def get_props_editor(self, parent):
         return QrCodePropsEdit(self.data, parent, self)
 

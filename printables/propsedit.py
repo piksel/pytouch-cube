@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGroupBox
 
 from printables.printable import PrintableData
-from qmargins_edit import QMarginsEdit
+from .qmargins_edit import QMarginsEdit
 
 
 class PropsEdit(QWidget):
