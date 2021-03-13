@@ -1,5 +1,5 @@
 <div align="center">
-<img src="https://github.com/piksel/pytouch-cube/raw/master/logo.png" width="256" />
+<img src="https://github.com/piksel/pytouch-cube/raw/main/logo.png" width="256" />
 </div>
 
 
