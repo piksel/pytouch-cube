@@ -53,9 +53,9 @@ class PrintThread(QThread):
             log.info(
                 'Printing label, width: {0} height: {1}'.format(self.print_image.width(), self.print_image.height()))
 
-            # lm = LabelMaker(self.print_device)
-            # lm.print_label(buf)
-            self.print_device.test()
+            lm = LabelMaker(self.print_device)
+            lm.print_label(buf)
+            # self.print_device.test()
             self.done.emit(None)
         except Exception as x:
             self.done.emit(x)
