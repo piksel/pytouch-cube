@@ -11,7 +11,8 @@ class LogConsole(QTextEdit):
         self.setReadOnly(True)
         font = QFont('Fira')
         font.setStyleHint(QFont.Monospace, QFont.PreferDefault)
-        font.setFamilies(['Fira', 'Source Code Pro', 'Monaco', 'Consolas', 'Monospaced', 'Courier'])
+        if hasattr(font, 'setFamilies'):
+            font.setFamilies(['Fira', 'Source Code Pro', 'Monaco', 'Consolas', 'Monospaced', 'Courier'])
         self.setFont(font)
 
         logging.root.addHandler(LogConsoleHandler(self))

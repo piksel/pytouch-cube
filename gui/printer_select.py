@@ -12,7 +12,7 @@ from .types import *
 class PrinterSelect(QComboBox):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.setPlaceholderText('Select Bluetooth Device...')
+        #self.setPlaceholderText('Select Bluetooth Device...')
         self.setModel(PrinterDevicesModel(self))
 
     @asyncSlot()
@@ -59,8 +59,8 @@ class PrinterSelect(QComboBox):
         # printer_select.setExpanded(dev_index, True)
         # model_proxy.setFilterWildcard('tty*')
 
-        for p in QDir('/dev').entryList(['tty*'], QDir.System, QDir.Name):
-            if p.startswith('tty.'):
+        for p in QDir('/dev').entryList(['tty*', 'rfcomm*'], QDir.System, QDir.Name):
+            if p.startswith('tty.') or p.startswith('rfcomm'):
                 device = '/dev/' + p
 
                 self.addItem(device, device)
