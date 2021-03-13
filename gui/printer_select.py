@@ -18,10 +18,10 @@ class PrinterSelect(QComboBox):
     @asyncSlot()
     async def update(self) -> None:
         self.clear()
-        if is_win:
-            candidate = await self.update_win()
-        else:
-            candidate = await self.update_devfs()
+#        if is_win:
+        candidate = await self.update_win()
+#        else:
+#            candidate = await self.update_devfs()
 
         #if candidate is not None:
         index = self.findText('PT-P3', Qt.MatchContains)
