@@ -4,6 +4,8 @@ from typing import *
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtWidgets import QWidget
 
+Color = Tuple[int, int, int]
+
 
 class PrinterDevicesModel(QStandardItemModel):
     class Columns(Enum):

@@ -44,17 +44,12 @@ class BluetoothPrinterDevice(PrinterDevice):
     async def list_devices(cls) -> List[Tuple[str, PrinterDevice]]:
         devices = bluetooth.discover_devices(1, flush_cache=False, lookup_names=True, lookup_class=True)
 
-        for d in devices:
-            pprint(d)
-
         return [(name if not None else address, BluetoothPrinterDevice(address, service)) for address, name, service in
                 devices]
 
     def test(self):
         log.info(f'Scanning {self.address} for services...')
         service_matches = bluetooth.find_service(address=self.address)
-        for d in service_matches:
-            pprint(d)
 
         first_match = service_matches[0]
 
@@ -64,8 +59,6 @@ class BluetoothPrinterDevice(PrinterDevice):
 
     def open(self):
         service_matches = bluetooth.find_service(address=self.address)
-        for d in service_matches:
-            pprint(d)
 
         first_match = service_matches[0]
 
@@ -138,8 +131,6 @@ class SerialPrinterDevice(PrinterDevice):
                                 dev_name = '{0} - {1} ({2})'.format(disp_name, name, tty)
                             else:
                                 dev_name = '{0} ({1})'.format(name, tty)
-                            print('Device:', tty, 'Address:', address)
-                            print('Name:', dev_name)
                             info = ListPortInfo(tty)
                             info.name = dev_name
                             ports.append(info)

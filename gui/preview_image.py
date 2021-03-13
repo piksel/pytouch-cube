@@ -1,10 +1,11 @@
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 from PyQt5.QtCore import pyqtSignal, QRect, Qt
-from PyQt5.QtGui import QPainter, QImage, QPixmap, QColor, QPalette
+from PyQt5.QtGui import QPainter, QImage, QPixmap, QColor, QPalette, QBitmap, QRegion
 from PyQt5.QtWidgets import QLabel, QWidget
 from qasync import QtGui
 
+from gui.types import Color
 from labelmaker import USABLE_HEIGHT
 
 
@@ -16,16 +17,31 @@ class PreviewImage(QLabel):
         self.selected_index = -1
         self.item_offsets: List[int] = []
         self.setFixedHeight(USABLE_HEIGHT + 2)
+        self.fg_color = Qt.black
+        self.bg_color = Qt.white
+        self.preview_bitmap = QPixmap()
+
+    def update_colors(self, fg: Color, bg: Color, repaint=True):
+        self.fg_color = QColor(*fg)
+        self.bg_color = QColor(*bg)
+
+    def repaint_preview(self):
+        pixmap = self.pixmap()
+        if pixmap is None:
+            return
+        painter = QPainter(pixmap)
+        self.draw_preview(painter)
+        painter.end()
+        self.repaint(self.preview_bitmap.rect())
 
     def update_selected(self, selected_index: int):
         self.selected_index = selected_index
         pixmap = self.pixmap()
         if pixmap is None:
             return
-        painter = QPainter(pixmap)
-        self.draw_selection(painter)
-        painter.end()
-        self.repaint()
+        with QPainter(pixmap) as painter:
+            self.draw_selection(painter)
+        self.repaint(QRect(0, USABLE_HEIGHT-1, self.preview_bitmap.width(), 4))
 
     def draw_selection(self, painter: QPainter):
         select_rect = QRect(0, USABLE_HEIGHT, 0, 4)
@@ -37,14 +53,21 @@ class PreviewImage(QLabel):
             painter.fillRect(select_rect, color)
 
     def setPixmap(self, a0: QtGui.QPixmap) -> None:
+        self.preview_bitmap = QBitmap(a0)
         img = QImage(a0.width(), a0.height() + 4, QImage.Format_RGB32)
         img.fill(self.palette().color(QPalette.Background))
-        painter = QPainter(img)
-        painter.drawImage(0, 0, a0.toImage())
-        self.draw_selection(painter)
-        painter.end()
+        if a0.width() > 0:
+            with QPainter(img) as painter:
+                self.draw_preview(painter)
+                self.draw_selection(painter)
         super().setPixmap(QPixmap(img))
         self.repaint()
+
+    def draw_preview(self, painter: QPainter):
+        painter.setBackgroundMode(Qt.OpaqueMode)
+        painter.setBackground(self.bg_color)
+        painter.setPen(self.fg_color)
+        painter.drawPixmap(0, 0, self.preview_bitmap)
 
     def mousePressEvent(self, ev: QtGui.QMouseEvent) -> None:
         x = ev.x()

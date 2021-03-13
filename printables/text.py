@@ -214,7 +214,7 @@ class Text(Printable):
         font.fromString(d.font_string)
         width = QFontMetrics(font).width(d.text)
         log.debug(f'Width: {width}, Font: {font}, Text: {d.text}')
-        img = QImage(width, USABLE_HEIGHT, QImage.Format_ARGB32)
+        img = QImage(width, USABLE_HEIGHT, QImage.Format_Mono)
         img.fill(0xffffffff)
         p = QPainter(img)
         p.setFont(font)

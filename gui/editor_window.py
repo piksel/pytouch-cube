@@ -2,8 +2,8 @@
 import logging
 import pickle
 
-from PyQt5.QtCore import Qt, QRect, QPoint, QMargins
-from PyQt5.QtGui import QPixmap, QImage, QPainter, QColor, QIcon
+from PyQt5.QtCore import Qt, QRect, QPoint, QMargins, QModelIndex
+from PyQt5.QtGui import QPixmap, QImage, QPainter, QColor, QIcon, QBitmap
 from PyQt5.QtWidgets import QApplication, QVBoxLayout, QPushButton, QLabel, QFileDialog, QHBoxLayout, \
     QGroupBox, QMessageBox, QMainWindow, QScrollArea, QSizePolicy
 
@@ -18,6 +18,7 @@ from .log_console import LogConsoleModal
 from .preview_image import PreviewImage
 from .printer_select import PrinterSelect
 from .source_items import SourceItems
+from .tape_select import TapeSelect
 from .top_menu import TopMenu
 from .types import *
 
@@ -45,6 +46,7 @@ class EditorWindow(QMainWindow):
         self.current_item = None
         self.print_thread = None
         self.item_preview_offsets = []
+        self.needs_invert = False
 
         Settings.load()
 
@@ -73,7 +75,7 @@ class EditorWindow(QMainWindow):
         items_layout.setAlignment(Qt.AlignLeft)
 
         sources.item_selected.connect(self.selected_item_changed)
-        sources.items_changed.connect(self.update_preview)
+        sources.items_changed.connect(self.items_changed)
 
         self.property_group = QGroupBox('Item properties:')
         self.props_layout = QVBoxLayout()
@@ -129,8 +131,13 @@ class EditorWindow(QMainWindow):
         bottom_bar = QHBoxLayout()
         bottom_bar.addWidget(QLabel('Print device:'))
         bottom_bar.addWidget(self.printer_select)
+
+        self.tape_select = TapeSelect(self)
+        self.tape_select.currentIndexChanged.connect(self.on_tape_changed)
+        bottom_bar.addWidget(QLabel('Tape:'))
+        bottom_bar.addWidget(self.tape_select)
         bottom_bar.addStretch()
-        # /dev/tty.PT-P300BT0607-Serial
+
         print_button = QPushButton('Print')
         print_button.setFixedWidth(100)
         bottom_bar.addWidget(print_button)
@@ -233,6 +240,19 @@ class EditorWindow(QMainWindow):
         self.current_file = file_path
         self.open()
 
+    def on_tape_changed(self, index: int):
+        if index < 0:
+            return
+        fg, bg = self.tape_select.get_colors(index)
+        self.preview_image.update_colors(fg, bg)
+
+        needs_invert = sum(bg) < sum(fg)
+        if needs_invert != self.needs_invert:
+            self.needs_invert = needs_invert
+            self.update_preview()
+        else:
+            self.preview_image.repaint_preview()
+
     def save(self):
         with open(self.current_file, 'wb') as file:
             pickler = pickle.Pickler(file)
@@ -292,13 +312,11 @@ class EditorWindow(QMainWindow):
         item_renders = []
         item_preview_offsets = []
         width_needed = 0
+        bg_color = Qt.white
 
-        curr_index = self.sources.table.currentIndex()
-        selected_index = curr_index.row()
         items = self.sources.items.items
         for i, item in enumerate(items):
-            selected = selected_index == i
-            render = item.render()
+            render = QBitmap(item.render())
             render_error = item.get_render_error()
             if render_error is not None:
                 continue
@@ -310,35 +328,52 @@ class EditorWindow(QMainWindow):
             dst_rect = QRect(QPoint(), sz.scaled(sz * margins.scale, Qt.KeepAspectRatio))
             # dst_rect.marginsAdded(margins.getQMargins())
             dst_rect.translate(width_needed, margins.vert + ((USABLE_HEIGHT - dst_rect.height()) / 2))
-
-            item_renders.append((render, dst_rect, src_rect, selected))
+            invert = self.needs_invert and item.get_type() in ['Image', 'Barcode', 'QRCode']
+            item_renders.append((render, dst_rect, src_rect, invert))
             width_needed += dst_rect.width()
             item_preview_offsets.append(width_needed)
 
         x = 0
         image = QImage(width_needed, USABLE_HEIGHT, QImage.Format_Mono)
-        image.fill(QColor(255, 255, 255))
+        image.fill(bg_color)
         painter = QPainter(image)
-        for render, dst_rect, src_rect, selected in iter(item_renders):
+        painter.setBackgroundMode(Qt.OpaqueMode)
+        for render, dst_rect, src_rect, invert in iter(item_renders):
             fill_rect = QRect(dst_rect.left(), 0, dst_rect.width(), USABLE_HEIGHT)
-            painter.fillRect(fill_rect, Qt.white)
-            painter.drawImage(dst_rect, render, src_rect)
+            painter.fillRect(fill_rect, bg_color)
+            if invert:
+                painter.setBackground(Qt.black)
+                painter.setPen(Qt.white)
+            else:
+                painter.setBackground(Qt.white)
+                painter.setPen(Qt.black)
+            painter.drawPixmap(dst_rect, render, src_rect)
             x += fill_rect.width()
-            # select_rect = fill_rect.adjusted(0, USABLE_HEIGHT, 0, 2)
-            # painter.fillRect(select_rect, Qt.black if selected else Qt.white)
         painter.end()
         del painter
 
         self.print_image = image
         self.preview_image.set_item_offsets(item_preview_offsets)
-        self.preview_image.selected_index = selected_index
+        # self.preview_image.selected_index = selected_index
         self.preview_image.setPixmap(QPixmap.fromImage(image))
         self.preview_image.repaint()
 
     def selected_item_changed(self, item: Optional[Printable]):
+        if self.current_item == item:
+            return
         self.current_item = item
         self.update_props()
         self.preview_image.update_selected(self.sources.table.currentIndex().row())
+
+    def items_changed(self):
+        self.update_preview()
+        # Since an auto-selected item does not trigger the event we have to do it manually if applicable
+        current_row = self.sources.table.currentIndex().row()
+        if current_row >= 0:
+            current_item = self.sources.items.items[current_row]
+        else:
+            current_item = None
+        self.selected_item_changed(current_item)
 
     def update_props(self):
 

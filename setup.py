@@ -8,46 +8,46 @@ Usage:
 from setuptools import setup
 from util import *
 import app
-import py2exe
 import site
 
 qt_plugin_root = site.getsitepackages()[1] + "\\PyQt5\\Qt\\plugins"
 
 APP = 'pytouch3.py'
-DATA_FILES = [
+data_files = [
     ('', ['pytouch3.png']),
 ]
 
+setup_requires = []
+requires = ['PyQt5', 'django-qrcode', 'pyserial', 'packbits', 'pypng', 'appdirs']
+kwargs = {}
+
 if is_mac:
-    SETUP_KW = {
-        "setup_requires": ['py2app', 'py2exe'],
-    }
+    setup_requires = ['py2app']
 elif is_win:
-    SETUP_KW = {
+    kwargs = {
         "windows": [{
             "script": APP[0],
             "icon_resources": [(0, "pytouch3.ico")],
             "dest_base": "pytouch3"
         }],
-        "setup_requires": ['py2app', 'py2exe'],
     }
-    DATA_FILES += [
+    setup_requires = ['py2exe~=0.10.2.1']
+    requires += ['wmi']
+    data_files += [
         ("platforms", [ qt_plugin_root + "\\platforms\\qwindows.dll"]),
         ("iconengines", [qt_plugin_root + "\\iconengines\\qsvgicon.dll"]),
         ("platformthemes", [qt_plugin_root + "\\platformthemes\\qxdgdesktopportal.dll"]),
         ("styles", [qt_plugin_root + "\\styles\\qwindowsvistastyle.dll"])
     ]
 else:
-    SETUP_KW = {
-        "setup_requires": ['py2app', 'py2exe'],
-    }
+    pass
 
 setup(
     name=app.APP_NAME,
     version=app.APP_VERSION,
     author=app.APP_AUTHOR,
     app=[APP],
-    data_files=DATA_FILES,
+    data_files=data_files,
     options={
         'py2app': {
             'iconfile': 'pytouch3.icns'
@@ -61,7 +61,7 @@ setup(
         }
     },
 
-    setup_requires=['py2app', 'py2exe'],
-    install_requires=['PyQt5', 'django-qrcode', 'pyserial', 'packbits', 'pypng', 'appdirs'],
-    **SETUP_KW
+    setup_requires=setup_requires,
+    install_requires=requires,
+    **kwargs
 )

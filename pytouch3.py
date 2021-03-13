@@ -27,7 +27,7 @@ def run(seed=False):
     editor = EditorWindow(app)
     editor.show()
 
-    if seed and True:
+    if seed:
         editor.sources.add_item(TextItem(TextData('foo')))
         editor.sources.add_item(TextItem(TextData('Bar1')))
         # editor.sources.add_item(TextItem(TextData('Bar2')))
