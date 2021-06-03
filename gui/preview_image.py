@@ -39,8 +39,9 @@ class PreviewImage(QLabel):
         pixmap = self.pixmap()
         if pixmap is None:
             return
-        with QPainter(pixmap) as painter:
-            self.draw_selection(painter)
+        if pixmap.width() > 0:
+            with QPainter(pixmap) as painter:
+                self.draw_selection(painter)
         self.repaint(QRect(0, USABLE_HEIGHT-1, self.preview_bitmap.width(), 4))
 
     def draw_selection(self, painter: QPainter):

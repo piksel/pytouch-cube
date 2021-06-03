@@ -19,8 +19,8 @@ class PrinterDevice(abc.ABC):
     def __init__(self, name):
         self.name = name
         self.baudrate = 9600
-        self.stopbits = serial.STOPBITS_ONE,
-        self.parity = serial.PARITY_NONE,
+        self.stopbits = serial.STOPBITS_ONE
+        self.parity = serial.PARITY_NONE
         self.timeout = 10
 
     @abc.abstractmethod
@@ -80,7 +80,7 @@ class SerialPrinterDevice(PrinterDevice):
         self.port_info = port_info
 
     def open(self):
-        serial.Serial(
+        return serial.Serial(
             self.port_info.device,
             baudrate=self.baudrate,
             stopbits=self.stopbits,

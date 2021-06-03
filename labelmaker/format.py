@@ -1,16 +1,16 @@
-from enum import Enum
+from enum import IntEnum
 
 
-class Phase(Enum):
+class Phase(IntEnum):
     RECEIVING = 0x00
     PRINTING = 0x01
 
 
-class Mode(Enum):
+class Mode(IntEnum):
     PTCBP = 1
 
 
-class Media(Enum):
+class Media(IntEnum):
     UNKNOWN = 0x00
 
     LAMINATED = 0x01

@@ -2,12 +2,14 @@ from enum import Enum
 
 
 class Error1(Enum):
+    ERROR1_NONE = 0
     ERROR1_NO_MEDIA = 0x01
     ERROR1_END_OF_MEDIA = 0x02
     ERROR1_TAPE_CUT_JAM = 0x04
 
 
 class Error2(Enum):
+    ERROR2_NONE = 0
     ERROR2_REPLACE_MEDIA = 0x01  # Replace the media.
     ERROR2_EXP_BUFFER_FULL = 0x02  # Expansion buffer is full.
     ERROR2_TRANS_ERROR = 0x04  # Transmission error
