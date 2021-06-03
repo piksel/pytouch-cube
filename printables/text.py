@@ -24,10 +24,10 @@ class TextData(PrintableData):
         if font_string is None:
             font = QFont()
             font.setStyleHint(QFont.Helvetica)
-            font.setFamily('Helvetica Neue')
+            if hasattr(font, 'setFamily'):
+                font.setFamily('Helvetica Neue')
 
             # font.Helvetica
-            log.debug(f'Default font: {font.family()} {font.families()}, {font.toString()}')
             font.setPixelSize(USABLE_HEIGHT)
             self.font_string = font.toString()
         else:

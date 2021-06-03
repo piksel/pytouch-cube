@@ -12,16 +12,16 @@ from .types import *
 class PrinterSelect(QComboBox):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.setPlaceholderText('Select Bluetooth Device...')
+        #self.setPlaceholderText('Select Bluetooth Device...')
         self.setModel(PrinterDevicesModel(self))
 
     @asyncSlot()
     async def update(self) -> None:
         self.clear()
-        if is_win:
-            candidate = await self.update_win()
-        else:
-            candidate = await self.update_devfs()
+#        if is_win:
+        candidate = await self.update_win()
+#        else:
+#            candidate = await self.update_devfs()
 
         #if candidate is not None:
         index = self.findText('PT-P3', Qt.MatchContains)
@@ -59,8 +59,8 @@ class PrinterSelect(QComboBox):
         # printer_select.setExpanded(dev_index, True)
         # model_proxy.setFilterWildcard('tty*')
 
-        for p in QDir('/dev').entryList(['tty*'], QDir.System, QDir.Name):
-            if p.startswith('tty.'):
+        for p in QDir('/dev').entryList(['tty*', 'rfcomm*'], QDir.System, QDir.Name):
+            if p.startswith('tty.') or p.startswith('rfcomm'):
                 device = '/dev/' + p
 
                 self.addItem(device, device)

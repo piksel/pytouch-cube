@@ -4,7 +4,7 @@ pyserial~=3.4
 packbits~=0.6
 pypng
 appdirs~=1.4.4
-pyyaml~=5.3.1
+pyyaml~=5.4.0
 qrcode~=6.1
 qasync~=0.13.0
 setuptools~=41.2.0
