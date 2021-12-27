@@ -2,7 +2,7 @@
   "name": "pytouch3-web",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://dev.p1k.se/pytouch3",
+  "homepage": "https://dev.p1k.se/pytouch-cube",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
