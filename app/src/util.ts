@@ -1,0 +1,1 @@
+export const valueOptions = (...values: string[]) => values.map(v => ({key: v, value: v, text: v[0].toUpperCase()+v.substring(1) }));
