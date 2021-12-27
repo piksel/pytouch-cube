@@ -1,6 +1,5 @@
 import { TextItemProps } from "./TextItem";
 import { ImageItemProps } from "./ImageItem";
-import { StateSetter } from "../types";
 
 export const BUFFER_HEIGHT = 128;
 export const PRINT_MARGIN = 30;

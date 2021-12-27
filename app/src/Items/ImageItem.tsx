@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Button, Form } from "semantic-ui-react";
-import { StateSetter } from "../types";
-import { ItemProps, USABLE_HEIGHT, applyThreshold, getImageDim, ItemEditorProps } from "./common";
+import { ItemProps, USABLE_HEIGHT, applyThreshold, ItemEditorProps } from "./common";
 
 
 export interface ImageItemProps extends ItemProps {

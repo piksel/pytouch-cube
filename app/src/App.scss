@@ -1,4 +1,5 @@
 .App {
+  background-color: transparent;
 }
 
 .App-logo {
@@ -52,9 +53,9 @@ $appPrimary: #6435c9;
       border-right-width: 1px;
       margin-right: -1px;
     }
-    canvas {
+    // canvas {
     // border: 2px solid $appPrimary;
-    }
+    // }
   }
   border: 1px dashed gray;
   &:not(:last-child){

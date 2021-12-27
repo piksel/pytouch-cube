@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { Checkbox, Form, Input, Label } from "semantic-ui-react";
+import React from "react";
+import { Checkbox, Form, Input } from "semantic-ui-react";
 import { ItemEditorProps, ItemProps } from "./common";
 
 type GenericItemProps = ItemProps & {type: any, image?: any, text?: any};

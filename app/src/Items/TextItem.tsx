@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Dropdown, Form, FormField, Input, Label, Message } from "semantic-ui-react";
+import { Dropdown, Form, Input, Message } from "semantic-ui-react";
 import { valueOptions } from "../util";
 import { ItemProps, USABLE_HEIGHT, applyThreshold, ItemEditorProps } from "./common";
 

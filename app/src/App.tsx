@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";
 import './App.scss';
 import 'semantic-ui-css/semantic.min.css';
 import { ImageItem, ImageItemEditor, TextItemEditor, TextItem, LabelItemEditor } from './Items';
 import { ItemProps, LabelItemData } from './Items/common';
-import { Button, Card, Container, Dropdown, Form, Header, Message, Popup, Segment, Select } from 'semantic-ui-react';
+import { Button, Card, Container, Dropdown, Form, Header, Popup, Segment } from 'semantic-ui-react';
 import { valueOptions } from './util';
 
 const itemDefaults = { marginTop: 0,  marginBottom: 0,  marginLeft: 0,  marginRight: 0 };
@@ -16,9 +16,14 @@ const default_items: LabelItemData[] = [
 ]
 
 function App() {
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<SerialOptions>();
+  const { register, handleSubmit, formState: { errors } } = useForm<SerialOptions>();
   const [currentPort, setCurrentPort] = useState<SerialPort | undefined>();
   const [error, setError] = useState<{title: string, message?: string} | undefined>();
+
+  useEffect(() => {
+    if(Object.values(errors).every(v => !v)) return;
+    // setError({title: 'Errors', })
+  }, [errors]);
 
   const [items, setItems] = useState<LabelItemData[]>(default_items);
 
