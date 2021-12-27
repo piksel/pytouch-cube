@@ -24,4 +24,12 @@ jobs:
       with:
         node-version: 16.x #${{ matrix.node-version }}
         # cache: 'yarn'
-    - run: cd app && yarn && yarn deploy
+    - run: git config --local user.name 'Github Actions'
+    - run: git config --local user.email 'actions@github.com'
+    - run: cd app && yarn
+    - run: cd app && yarn build
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@4.1.7
+      with:
+        branch: gh-pages # The branch the action should deploy to.
+        folder: app/build # The folder the action should deploy.
