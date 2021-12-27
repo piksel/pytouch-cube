@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "pytouch3-web",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -21,11 +21,16 @@
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1"
   },
+  "devDependencies": {
+    "gh-pages": "^3.2.3"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "yarn build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
