@@ -9,10 +9,10 @@ import { valueOptions } from './util';
 
 const itemDefaults = { marginTop: 0,  marginBottom: 0,  marginLeft: 0,  marginRight: 0 };
 const default_items: LabelItemData[] = [
-  { key: 't1', type: 'text', text: 'Hello?', font: '40px otsutome_font', ...itemDefaults },
-  { key: 't2', type: 'text', text: 'Text with space', font: '40px otsutome_font', ...itemDefaults },
-  { key: 'i1', type: 'image', image: '/shoutrrr.png', ...itemDefaults },
-  { key: 't3', type: 'text', text: 'Wow!!', font: '40px otsutome_font' , ...itemDefaults},
+  { key: 't1', type: 'text', text: 'Hello?', font: '40px sans-serif', ...itemDefaults },
+  { key: 't2', type: 'text', text: 'Text with space', font: '40px sans-serif', ...itemDefaults },
+  { key: 'i1', type: 'image', image: './shoutrrr.png', ...itemDefaults },
+  { key: 't3', type: 'text', text: 'Wow!!', font: '40px sans-serif' , ...itemDefaults},
 ]
 
 function App() {
