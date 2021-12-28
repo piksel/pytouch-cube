@@ -302,7 +302,8 @@ const FontLoader: React.FC<{webFonts: WebFont[], onError: ((error: Error) => voi
 
   useEffect(() => {
       const fontVariants = webFonts.flatMap(font => font.variants.map(v => {
-          const source = font.files[v];
+          const source = new URL(font.files[v]);
+          source.protocol = document.location.protocol;
           const fontFace = new FontFace(font.family, `URL(${source})`);
           console.log(`Loading font "${font.family}" (${v}) from ${source}`);
           return fontFace;
