@@ -24,7 +24,7 @@ function App() {
   const [error, setError] = useState<{title: string, message?: string} | undefined>();
   const [webFonts, setWebFonts] = useState<WebFont[]>([]);
 
-  const [background, setBackground] = useState<string>("#f0f0f0");
+  const [background, setBackground] = useState<string>("#ffffff");
   const [foreground, setForeground] = useState<string>("#000000");
 
   const labelColor: [number, number, number] = useMemo(() => (c => [(c >> 16) & 0xff, (c >> 8) & 0xff, c & 0xff])(parseInt(foreground.substring(1), 16)), [foreground])
@@ -77,7 +77,7 @@ function App() {
         </Header>
 
       {error && (<dialog><header>{error.title}</header><div>{error.message  ?? 'Unknown error'}</div></dialog>)}
-      <div style={{overflowY: 'visible',overflowX: 'auto', background: '#fff', padding: '10px', boxShadow: 'inset 1px 1px 4px #00000020' }}>
+      <div style={{overflowY: 'visible',overflowX: 'auto', background: '#e9e9e9', padding: '10px', boxShadow: 'inset 1px 1px 4px #00000020' }}>
       <div style={{display: 'flex', flexDirection: 'row', alignItems: 'flex-start', background: background, width: 'fit-content', boxShadow: '1px 1px 4px #00000020'  }}>
 
         {items.map(item =>
@@ -101,8 +101,8 @@ function App() {
 
       {/* <LabelPreview />
       <ImagePreview /> */}
-      <div style={{flex: 'auto', background: '#ffffff', alignSelf: 'stretch', display: 'flex', marginRight: '-10px'}}>
-        <Popup on='click' trigger={<Button icon='plus' basic style={{boxShadow: 'none'}} size='massive' />}>
+      <div style={{flex: 'auto', opacity: 0.5, alignSelf: 'stretch', display: 'flex'}}>
+        <Popup on='click' trigger={<Button icon='plus' basic style={{boxShadow: 'none', margin: 0}} size='massive' />}>
           <AddLabelDialog onAdd={(item) => setItems(items => [...items, item])} />
         </Popup>
         
