@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/pytouch-cube/static/css/main.5f8787b6.chunk.css",
-    "main.js": "/pytouch-cube/static/js/main.bc68cd1d.chunk.js",
-    "main.js.map": "/pytouch-cube/static/js/main.bc68cd1d.chunk.js.map",
+    "main.js": "/pytouch-cube/static/js/main.0004e720.chunk.js",
+    "main.js.map": "/pytouch-cube/static/js/main.0004e720.chunk.js.map",
     "runtime-main.js": "/pytouch-cube/static/js/runtime-main.0fc7a6b9.js",
     "runtime-main.js.map": "/pytouch-cube/static/js/runtime-main.0fc7a6b9.js.map",
     "static/css/2.61c6aa8f.chunk.css": "/pytouch-cube/static/css/2.61c6aa8f.chunk.css",
@@ -21,6 +21,6 @@
     "static/css/2.61c6aa8f.chunk.css",
     "static/js/2.d1f21680.chunk.js",
     "static/css/main.5f8787b6.chunk.css",
-    "static/js/main.bc68cd1d.chunk.js"
+    "static/js/main.0004e720.chunk.js"
   ]
 }
