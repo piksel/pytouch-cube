@@ -4,10 +4,12 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+const ModeWrapper = process.env.STRICT_MODE === 'yes' ? React.StrictMode : React.Fragment;
+
 ReactDOM.render(
-  <React.StrictMode>
+  <ModeWrapper>
     <App />
-  </React.StrictMode>,
+  </ModeWrapper>,
   document.getElementById('root')
 );
 

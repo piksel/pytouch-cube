@@ -1,21 +1,24 @@
 import React from "react";
 import { Checkbox, Form, Input } from "semantic-ui-react";
-import { ItemEditorProps, ItemProps } from "./common";
+import { ItemData, ItemEditorProps } from "./common";
 
-type GenericItemProps = ItemProps & {type: any, image?: any, text?: any};
+// type GenericItemProps = ItemProps & {type: any, image?: any, text?: any};
 
-export const LabelItemEditor: React.FC<ItemEditorProps<GenericItemProps>> = (props) => {
-    const {item, setItem} = props;
+export const LabelItemEditor: React.FC<ItemEditorProps<ItemData>> = (props) => {
+    const {data, setData} = props;
 
 
     return (
         <Form>
             <Form.Field>
-                <Checkbox toggle checked={item.inverted} label="Inverted" onChange={(_, d) => setItem(({...item, inverted: !!d.checked}))} />
+                <Checkbox toggle checked={data.inverted} label="Inverted" onChange={(_, d) => setData(({...data, inverted: !!d.checked}))} />
+            </Form.Field>
+            <Form.Field>
+                <Checkbox toggle checked={data.mask} label="Mask" onChange={(_, d) => setData(({...data, mask: !!d.checked}))} />
             </Form.Field>
             <Form.Field>
 
-                <Checkbox toggle checked={item.rotated} label="Rotated" />
+                <Checkbox toggle checked={data.rotated} label="Rotated" />
             </Form.Field>
             <Form.Field>
 
@@ -25,10 +28,10 @@ export const LabelItemEditor: React.FC<ItemEditorProps<GenericItemProps>> = (pro
                 <Form.Group widths='equal'>
             <Form.Field>
 
-                <Checkbox toggle checked={item.flippedHorizontal} label="Horizontal" />
+                <Checkbox toggle checked={data.flippedHorizontal} label="Horizontal" />
                 <Form.Field>
                 </Form.Field>
-                <Checkbox toggle checked={item.flippedVertical} label="Vertical" />
+                <Checkbox toggle checked={data.flippedVertical} label="Vertical" />
             </Form.Field>
 
                 </Form.Group>
@@ -36,7 +39,7 @@ export const LabelItemEditor: React.FC<ItemEditorProps<GenericItemProps>> = (pro
 
             <Form.Field>
                 <label>Threshold</label>
-                <Input type="range" min="0" max="254" value={item.threshold ?? 128} onChange={(_, d) => setItem(({...item, threshold: parseInt(d.value, 10)}))} />
+                <Input type="range" min="0" max="254" value={data.threshold ?? 128} onChange={(_, d) => setData(({...data, threshold: parseInt(d.value, 10)}))} />
             </Form.Field>
 
         </Form>

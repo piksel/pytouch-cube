@@ -1,16 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { Button, Form } from "semantic-ui-react";
-import { ItemProps, USABLE_HEIGHT, applyThreshold, ItemEditorProps } from "./common";
+import { ItemProps, USABLE_HEIGHT, applyThreshold, ItemEditorProps, ItemData } from "./common";
 
-
-export interface ImageItemProps extends ItemProps {
+export interface ImageItemData extends ItemData {
     type: 'image';
     image: string;
 }
 
+export interface ImageItemProps extends ItemProps {
+    data: ImageItemData;
+}
 
 
-export const ImageItemEditor: React.FC<ItemEditorProps<ImageItemProps>> = (props) => {
+
+export const ImageItemEditor: React.FC<ItemEditorProps<ImageItemData>> = (props) => {
 
     return (
         <>
@@ -25,7 +28,8 @@ export const ImageItemEditor: React.FC<ItemEditorProps<ImageItemProps>> = (props
 }
 
 export const ImageItem: React.FC<ImageItemProps> = (props) => {
-    const {threshold, inverted, image} = props;
+    const {data} = props;
+    const {threshold, inverted, image} = props.data;
     const [width, setWidth] = useState(200);
     const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -61,9 +65,9 @@ export const ImageItem: React.FC<ImageItemProps> = (props) => {
 
         if (width <= 0) return;
 
-        applyThreshold(ctx, threshold, inverted)
+        applyThreshold(ctx, props.color, threshold, inverted, data.mask)
 
-    }, [canvasRef, width, image, threshold, inverted, imageLoaded]);
+    }, [canvasRef, width, image, threshold, inverted, imageLoaded, props.color, data.mask]);
 
     useEffect(()=> {
         setImageLoaded(false);

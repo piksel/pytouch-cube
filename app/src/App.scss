@@ -53,13 +53,47 @@ $appPrimary: #6435c9;
       border-right-width: 1px;
       margin-right: -1px;
     }
-    // canvas {
-    // border: 2px solid $appPrimary;
-    // }
+
   }
-  border: 1px dashed gray;
+  border: 1px dashed transparent;
   &:not(:last-child){
     border-right-width: 0;
     margin-right: 0;
   }
+  
+  position: relative;
+  canvas {
+    z-index: 100;
+  }
+  .indicator {
+    background: linear-gradient(#80808000, #80808080);
+    position: absolute;
+    top: -10px;
+    height: 10px;
+    width: 1px;
+    right: -1px;
+  }
 }
+
+
+// General utility classes
+.capitalized, .ui.label.capitalized {
+  text-transform: capitalize;
+}
+
+.normal-weight, .ui.label.normal-weight {
+  font-weight: normal;
+}
+
+.ellipsis {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 100%;
+  overflow: hidden;
+
+  // Stupid hack for table overflow
+  @media only screen and (min-width: 992px) and (max-width: 1199px) {max-width: 840px;}
+  @media only screen and (min-width: 768px) and (max-width: 991px) {max-width: 630px;}
+  @media only screen and (max-width: 767px) { max-width: calc(100vw - 100px) }
+}
+

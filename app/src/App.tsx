@@ -1,13 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from "react-hook-form";
 import './App.scss';
 import 'semantic-ui-css/semantic.min.css';
 import { ImageItem, ImageItemEditor, TextItemEditor, TextItem, LabelItemEditor } from './Items';
-import { ItemProps, LabelItemData } from './Items/common';
-import { Button, Card, Container, Dropdown, Form, Header, Popup, Segment } from 'semantic-ui-react';
+import { ItemData, LabelItemData } from './Items/common';
+import { Button, Card, Container, Dropdown, Form, Header, Loader, Menu, MenuItem, Popup, Segment } from 'semantic-ui-react';
 import { valueOptions } from './util';
+import { Link, Route } from 'wouter';
+import { FontsPage } from './Pages/FontsPage';
+import { WebFont } from './fonts';
 
-const itemDefaults = { marginTop: 0,  marginBottom: 0,  marginLeft: 0,  marginRight: 0 };
+const itemDefaults = { marginTop: 0,  marginBottom: 0,  marginLeft: 0,  marginRight: 0, color: [0, 0, 0] as [number, number, number] };
 const default_items: LabelItemData[] = [
   { key: 't1', type: 'text', text: 'Hello?', font: '40px sans-serif', ...itemDefaults },
   { key: 't2', type: 'text', text: 'Text with space', font: '40px sans-serif', ...itemDefaults },
@@ -16,6 +19,115 @@ const default_items: LabelItemData[] = [
 ]
 
 function App() {
+  
+  const [items, setItems] = useState<LabelItemData[]>(default_items);
+  const [error, setError] = useState<{title: string, message?: string} | undefined>();
+  const [webFonts, setWebFonts] = useState<WebFont[]>([]);
+
+  const [background, setBackground] = useState<string>("#f0f0f0");
+  const [foreground, setForeground] = useState<string>("#000000");
+
+  const labelColor: [number, number, number] = useMemo(() => (c => [(c >> 16) & 0xff, (c >> 8) & 0xff, c & 0xff])(parseInt(foreground.substring(1), 16)), [foreground])
+
+  const [selectedItem, setSelectedItem] = useState<LabelItemData | null>(null);
+
+  const updateItem = (newItem: LabelItemData | ItemData) =>
+    setItems(current => current.map(i => i.key === newItem.key ? newItem : i) as LabelItemData[]);
+  
+
+  
+
+  return (
+    <div className="App">
+      <Container>
+        <Menu>
+          <Link href={`${process.env.PUBLIC_URL}/label`}>
+            <MenuItem content='Label'></MenuItem>
+          </Link>
+          <Link href={`${process.env.PUBLIC_URL}/fonts`}>
+            <MenuItem content='Fonts'></MenuItem>
+          </Link>
+          <Link href={`${process.env.PUBLIC_URL}/printer`}>
+            <MenuItem content='Printer'></MenuItem>
+          </Link>
+        </Menu>
+
+      <Route path={`${process.env.PUBLIC_URL}/printer`}>
+        <ConnectionCard />
+      </Route>
+
+      <Route path={`${process.env.PUBLIC_URL}/fonts`}>
+        <FontsPage webFonts={webFonts} setWebFonts={setWebFonts} />
+      </Route>
+
+      <Route path={`${process.env.PUBLIC_URL}/label`}>
+        <FontLoader webFonts={webFonts} onError={(e: Error) => setError({title: 'Error loading font', message: e?.message})} />
+
+
+
+      <Segment>
+        <Header>Label editor
+          <div style={{float: 'right'}}><label>BG:
+          <input type='color' value={background} onChange={e => setBackground(e.target.value)}></input>
+            </label></div>
+            <div style={{float: 'right'}}><label>FG:
+          <input type='color' value={foreground} onChange={e => setForeground(e.target.value)}></input>
+            </label></div>
+
+        </Header>
+
+      {error && (<dialog><header>{error.title}</header><div>{error.message  ?? 'Unknown error'}</div></dialog>)}
+      <div style={{overflowY: 'visible',overflowX: 'auto', background: '#fff', padding: '10px', boxShadow: 'inset 1px 1px 4px #00000020' }}>
+      <div style={{display: 'flex', flexDirection: 'row', alignItems: 'flex-start', background: background, width: 'fit-content', boxShadow: '1px 1px 4px #00000020'  }}>
+
+        {items.map(item =>
+        <Popup key={item.key} on='click' position="bottom center" onOpen={() => setSelectedItem(item)} onClose={() => setSelectedItem(null)} trigger={
+          <div className={`label-item${selectedItem?.key === item.key?' selected':''}`}>{/* onClick={() => setSelectedItem(item)} */}
+            <div className='indicator' />
+          {
+            item.type === 'text' ? <TextItem data={item} color={labelColor} /> :
+            item.type === 'image' ? <ImageItem data={item}  color={labelColor} /> :
+            <div>Invalid item</div>
+          } 
+          </div>
+        }>
+          <LabelItemEditor data={item} setData={updateItem} />
+          {item.type === 'text' && <TextItemEditor data={item} setData={updateItem} />}
+          {item.type === 'image' && <ImageItemEditor data={item} setData={updateItem} />}
+        </Popup>
+
+        )}
+
+      {/* <LabelPreview />
+      <ImagePreview /> */}
+      <div style={{flex: 'auto', background: '#ffffff', alignSelf: 'stretch'}} />
+      </div>
+      </div>
+      </Segment>
+      </Route>
+      {/* <Segment attached='top'>
+        {selectedItem ? (
+          <>
+                      {selectedItem.type === 'text' && <TextItemEditor item={selectedItem} />}
+                      {selectedItem.type === 'image' && <ImageItemEditor item={selectedItem} />}
+          </>
+        ):(
+          <Message content='Select an item to edit' />
+        )}
+      </Segment> */}
+      </Container> 
+    </div>
+  );
+}
+
+// {ports.map(port => (
+//   <li key={port.key}><details><summary>{port.key}</summary><pre>{JSON.stringify(port, null, 2)}</pre></details></li>
+// ))}
+
+export default App;
+
+const ConnectionCard = () => {
+
   const { register, handleSubmit, formState: { errors } } = useForm<SerialOptions>();
   const [currentPort, setCurrentPort] = useState<SerialPort | undefined>();
   const [error, setError] = useState<{title: string, message?: string} | undefined>();
@@ -24,8 +136,6 @@ function App() {
     if(Object.values(errors).every(v => !v)) return;
     // setError({title: 'Errors', })
   }, [errors]);
-
-  const [items, setItems] = useState<LabelItemData[]>(default_items);
 
   const onSerialConnect = (e: Event) => {
     console.log(`Connected!`, e.target)
@@ -86,14 +196,8 @@ function App() {
     //console.log('Info:', port.getInfo());
   }
 
-  const [selectedItem, setSelectedItem] = useState<LabelItemData | null>(null);
-
-  const updateItem = (newItem: LabelItemData | ItemProps) => setItems(current => current.map(i => i.key === newItem.key ? newItem : i) as LabelItemData[]);
-
   return (
-    <div className="App">
-      <Container>
-        <Card fluid>
+    <Card fluid>
           <Card.Header style={{padding: '10px'}}>
       <Button floated='right' color='violet' size='tiny' onClick={() => updatePorts()}>Update Ports</Button>
           <Header floated='left'>Printer communication</Header>
@@ -138,53 +242,49 @@ function App() {
 
       <Button type="submit" content="Connect" />
 
+      {error && (<dialog><header>{error.title}</header><div>{error.message  ?? 'Unknown error'}</div></dialog>)}
+
       </Form>
             </Card.Content>
       </Card>
-      <Segment>
-        <Header>Label editor</Header>
-      {error && (<dialog><header>{error.title}</header><div>{error.message  ?? 'Unknown error'}</div></dialog>)}
-
-      <div style={{display: 'flex', flexDirection: 'row', alignItems: 'flex-start'}}>
-
-        {items.map(item =>
-        <Popup key={item.key} on='click' position="bottom center" onOpen={() => setSelectedItem(item)} onClose={() => setSelectedItem(null)} trigger={
-          <div className={`label-item${selectedItem?.key === item.key?' selected':''}`}>{/* onClick={() => setSelectedItem(item)} */}
-          {
-            item.type === 'text' ? <TextItem {...item} /> :
-            item.type === 'image' ? <ImageItem {...item} /> :
-            <div>Invalid item</div>
-          } 
-          </div>
-        }>
-          <LabelItemEditor item={item} setItem={updateItem} />
-          {item.type === 'text' && <TextItemEditor item={item} setItem={updateItem} />}
-          {item.type === 'image' && <ImageItemEditor item={item} setItem={updateItem} />}
-        </Popup>
-
-        )}
-
-      {/* <LabelPreview />
-      <ImagePreview /> */}
-      </div>
-      </Segment>
-      {/* <Segment attached='top'>
-        {selectedItem ? (
-          <>
-                      {selectedItem.type === 'text' && <TextItemEditor item={selectedItem} />}
-                      {selectedItem.type === 'image' && <ImageItemEditor item={selectedItem} />}
-          </>
-        ):(
-          <Message content='Select an item to edit' />
-        )}
-      </Segment> */}
-      </Container> 
-    </div>
-  );
+  )
 }
 
-// {ports.map(port => (
-//   <li key={port.key}><details><summary>{port.key}</summary><pre>{JSON.stringify(port, null, 2)}</pre></details></li>
-// ))}
 
-export default App;
+
+
+
+const FontLoader: React.FC<{webFonts: WebFont[], onError: ((error: Error) => void)}> = ({webFonts, onError}) => {
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+      const fontVariants = webFonts.flatMap(font => font.variants.map(v => {
+          const source = font.files[v];
+          const fontFace = new FontFace(font.family, `URL(${source})`);
+          console.log(`Loading font "${font.family}" (${v}) from ${source}`);
+          return fontFace;
+      }));
+
+      Promise.all(fontVariants.map(async ff => {
+        try {
+          await ff.load();
+          console.log(`Loaded "${ff.family}"!`);
+          document.fonts.add(ff);
+        } catch(error) {
+          onError(error as Error);
+        }
+      })).then(() => setLoading(false));
+
+      return () => {
+          fontVariants.forEach(fontFace => {
+              console.log(`Unloading "${fontFace.family} // ${fontFace.featureSettings} // ${fontFace.style}!`);
+              document.fonts.delete(fontFace);
+          });
+      }
+  }, [webFonts, onError]);
+
+  return (
+      <Loader active={loading} />
+  )
+}
