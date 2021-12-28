@@ -10,15 +10,17 @@ export const LabelItemEditor: React.FC<ItemEditorProps<ItemData>> = (props) => {
 
     return (
         <Form>
+            <Form.Group widths='equal'>
             <Form.Field>
-                <Checkbox toggle checked={data.inverted} label="Inverted" onChange={(_, d) => setData(({...data, inverted: !!d.checked}))} />
+                <Checkbox toggle checked={data.inverted} label="Inverted" disabled={(data as any).type === 'text'} onChange={(_, d) => setData(({...data, inverted: !!d.checked}))} />
             </Form.Field>
             <Form.Field>
                 <Checkbox toggle checked={data.mask} label="Mask" onChange={(_, d) => setData(({...data, mask: !!d.checked}))} />
             </Form.Field>
+            </Form.Group>
             <Form.Field>
 
-                <Checkbox toggle checked={data.rotated} label="Rotated" />
+                <Checkbox toggle checked={data.rotated} disabled label="Rotated" />
             </Form.Field>
             <Form.Field>
 
@@ -28,10 +30,11 @@ export const LabelItemEditor: React.FC<ItemEditorProps<ItemData>> = (props) => {
                 <Form.Group widths='equal'>
             <Form.Field>
 
-                <Checkbox toggle checked={data.flippedHorizontal} label="Horizontal" />
-                <Form.Field>
+                <Checkbox toggle checked={data.flippedHorizontal} disabled label="Horizontal" />
                 </Form.Field>
-                <Checkbox toggle checked={data.flippedVertical} label="Vertical" />
+                <Form.Field>
+                <Checkbox toggle checked={data.flippedVertical} disabled label="Vertical" />
+                
             </Form.Field>
 
                 </Form.Group>

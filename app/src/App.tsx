@@ -1,16 +1,16 @@
-import { useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useForm } from "react-hook-form";
 import './App.scss';
 import 'semantic-ui-css/semantic.min.css';
 import { ImageItem, ImageItemEditor, TextItemEditor, TextItem, LabelItemEditor } from './Items';
 import { ItemData, LabelItemData } from './Items/common';
-import { Button, Card, Container, Dropdown, Form, Header, Loader, Menu, MenuItem, Popup, Segment } from 'semantic-ui-react';
+import { Button, Card, Container, Dropdown, Form, Header, Input, Loader, Menu, MenuItem, Popup, Radio, Segment } from 'semantic-ui-react';
 import { valueOptions } from './util';
 import { Link, Route } from 'wouter';
 import { FontsPage } from './Pages/FontsPage';
 import { WebFont } from './fonts';
 
-const itemDefaults = { marginTop: 0,  marginBottom: 0,  marginLeft: 0,  marginRight: 0, color: [0, 0, 0] as [number, number, number] };
+const itemDefaults = { marginTop: 0,  marginBottom: 0,  marginLeft: 0,  marginRight: 0 };
 const default_items: LabelItemData[] = [
   { key: 't1', type: 'text', text: 'Hello?', font: '40px sans-serif', ...itemDefaults },
   { key: 't2', type: 'text', text: 'Text with space', font: '40px sans-serif', ...itemDefaults },
@@ -81,14 +81,15 @@ function App() {
       <div style={{display: 'flex', flexDirection: 'row', alignItems: 'flex-start', background: background, width: 'fit-content', boxShadow: '1px 1px 4px #00000020'  }}>
 
         {items.map(item =>
-        <Popup key={item.key} on='click' position="bottom center" onOpen={() => setSelectedItem(item)} onClose={() => setSelectedItem(null)} trigger={
+        <Popup key={item.key} on='click' position='bottom right' onOpen={() => setSelectedItem(item)} onClose={() => setSelectedItem(null)} trigger={
           <div className={`label-item${selectedItem?.key === item.key?' selected':''}`}>{/* onClick={() => setSelectedItem(item)} */}
             <div className='indicator' />
           {
             item.type === 'text' ? <TextItem data={item} color={labelColor} /> :
             item.type === 'image' ? <ImageItem data={item}  color={labelColor} /> :
             <div>Invalid item</div>
-          } 
+          }
+            <div className='indicator' />
           </div>
         }>
           <LabelItemEditor data={item} setData={updateItem} />
@@ -100,7 +101,12 @@ function App() {
 
       {/* <LabelPreview />
       <ImagePreview /> */}
-      <div style={{flex: 'auto', background: '#ffffff', alignSelf: 'stretch'}} />
+      <div style={{flex: 'auto', background: '#ffffff', alignSelf: 'stretch', display: 'flex', marginRight: '-10px'}}>
+        <Popup on='click' trigger={<Button icon='plus' basic style={{boxShadow: 'none'}} size='massive' />}>
+          <AddLabelDialog onAdd={(item) => setItems(items => [...items, item])} />
+        </Popup>
+        
+        </div>
       </div>
       </div>
       </Segment>
@@ -125,6 +131,42 @@ function App() {
 // ))}
 
 export default App;
+
+const AddLabelDialog: FC<{onAdd: ((data: LabelItemData)=>void)}> = ({onAdd}) => {
+
+  const [type, setType] = useState<'text'|'image'>('text');
+  const [value, setValue] = useState('');
+  
+  const key = useMemo(() => new  Date().getTime().toFixed(0), []);
+
+  const newItemData: LabelItemData = useMemo(()=> type === 'image' 
+    ? ({ type, key,  ...itemDefaults,  image: value })
+    : ({ type, key,  ...itemDefaults,  text: value, font: '40px sans-serif' })
+  , [type, value, key]);
+
+  return (
+    <Form onSubmit={() => onAdd(newItemData)} style={{minWidth: '400px'}}>
+      <Form.Group widths='equal'>
+        <Form.Field>
+      <Radio label='Text' checked={type === 'text'} onChange={() => setType('text')} />
+
+        </Form.Field>
+        <Form.Field>
+      <Radio label='Image' checked={type === 'image'} onChange={() => setType('image')} />
+        </Form.Field>
+
+      </Form.Group>
+      <Form.Group widths='equal'>
+        <Form.Field width={12}>
+      <Input type='text' fluid placeholder={type === 'text' ? 'Enter text...' : 'https://...'} value={value} onChange={e => setValue(e.target.value)} />
+      </Form.Field>
+        <Form.Field width={4}>
+      <Button type='submit' content='Add' />
+      </Form.Field>
+      </Form.Group>
+    </Form>
+  )
+}
 
 const ConnectionCard = () => {
 

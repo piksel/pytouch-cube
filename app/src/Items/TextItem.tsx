@@ -1,6 +1,7 @@
 import { env } from "process";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Dropdown, Form, Input, Message, Modal } from "semantic-ui-react";
+import { Dropdown, Form, Input } from "semantic-ui-react";
+import { Link } from "wouter";
 import { valueOptions } from "../util";
 import { ItemProps, applyThreshold, ItemEditorProps, ItemData } from "./common";
 
@@ -164,12 +165,16 @@ export const TextItemEditor: React.FC<ItemEditorProps<TextItemData>> = (props) =
         return valueOptions(...fonts)
     }, []);
 
-    const fontString = useMemo(() => `${fontSize}px ${fontName}`, [fontName, fontSize]);
-
     return (
         <>
 
             <Form style={{minWidth: '400px'}}>
+
+            <Form.Field>
+                    <label>Text</label>
+                    <Input type="text" value={data.text} onChange={e => setData({...data, text: e.target.value})} />
+                </Form.Field>
+
                 <Form.Group widths='equal'>
                     <Form.Field>
                         <label>Font</label>
@@ -181,14 +186,9 @@ export const TextItemEditor: React.FC<ItemEditorProps<TextItemData>> = (props) =
                     </Form.Field>
 
                 </Form.Group>
-                    <AddFontModal />
+                    <Link href={`${process.env.PUBLIC_URL}/fonts`}>Add additional fonts...</Link>
 
-                    <Message content={<code>{fontString}</code>} header="Font string:" />
 
-                <Form.Field>
-                    <label>Text</label>
-                    <Input type="text" value={data.text} onChange={e => setData({...data, text: e.target.value})} />
-                </Form.Field>
             </Form>
         </>
     )
@@ -196,20 +196,4 @@ export const TextItemEditor: React.FC<ItemEditorProps<TextItemData>> = (props) =
 
 const bumpFontSize = (s: number | undefined, amount: number): number | undefined => 
     typeof s !== 'number' ? s : Math.max(s + amount, 1);
-
-const AddFontModal: React.FC<{}> = (_) => {
-
-
-
-    return (
-        <Modal trigger={<Button content="Add new font" />}>
-            <Modal.Header>Add new font</Modal.Header>
-
-            <Modal.Content>
-                Go to fonts!
-            </Modal.Content>
-
-        </Modal>
-    )
-}
 

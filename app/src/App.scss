@@ -66,9 +66,14 @@ $appPrimary: #6435c9;
     z-index: 100;
   }
   .indicator {
-    background: linear-gradient(#80808000, #80808080);
+    background: #00000060;//linear-gradient(#80808000, #80808080);
     position: absolute;
-    top: -10px;
+    &:last-child {
+      bottom: -8px;
+    }
+    &:first-child {
+      top: -8px;
+    }
     height: 10px;
     width: 1px;
     right: -1px;
