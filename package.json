@@ -1,5 +1,5 @@
 {
-  "devDependencies": {
+  "devDependencies-disabled": {
     "cz-conventional-changelog": "3.0.2"
   },
   "config": {
