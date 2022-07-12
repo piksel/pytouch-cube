@@ -76,20 +76,35 @@ def get_parser():
     ### define the print modes
     print_modes = cli.add_subparsers(title="Print mode", dest="print_mode", required=True)
     label = print_modes.add_parser(
-        "label", help="Configure printables", argument_default=argparse.SUPPRESS)
+        "label", help="Configure printables. Order is preserved", 
+        argument_default=argparse.SUPPRESS)
     label_file = print_modes.add_parser(
         "file", help="Open predefined label file that was generate from the UI")
 
     ### the printables arguments
-    label.add_argument("-t", "--text", type=str, action=OrderArguments)
-    label.add_argument("-q", "--qr-code", type=str, action=OrderArguments)
-    label.add_argument("-s", "--spacing", type=int, action=OrderArguments)
-    label.add_argument("-b", "--barcode", type=tuple_type_factory([str,str]), action=OrderArguments)
-    label.add_argument("-l", "--labeled-barcode", type=tuple_type_factory([str,str]), action=OrderArguments)
-    label.add_argument("-i", "--image", type=tuple_type_factory([str, int]), action=OrderArguments)
+    label.add_argument(
+        "-t", "--text", help="Text to write. Font is taken from --default-font",
+        type=str, action=OrderArguments)
+    label.add_argument(
+        "-q", "--qr-code", help="Argument is the qr-code data",
+        type=str, action=OrderArguments)
+    label.add_argument(
+        "-s", "--spacing", help="Adds spacing. Argument should be int",
+        type=int, action=OrderArguments)
+    label.add_argument(
+        "-b", "--barcode", help="Add barcode delimited with ':' in the format DATA:BARCODE_TYPE"
+        type=tuple_type_factory([str,str]), action=OrderArguments)
+    label.add_argument(
+        "-l", "--labeled-barcode", help="Add barcode with label. See --barcode",
+        type=tuple_type_factory([str,str]), action=OrderArguments)
+    label.add_argument(
+        "-i", "--image", help="Adds an image with format IMAGE_PATH:THRESHOLD. Where threshold is an int",
+        type=tuple_type_factory([str, int]), action=OrderArguments)
 
     ## add argument for label file
-    label_file.add_argument("label_file_name", type=str)
+    label_file.add_argument(
+        "label_file_name", help="File path to label project file",
+        type=str)
 
 
     return parser
