@@ -49,6 +49,8 @@ class CliPrint:
 
     def print(self):
         self.editor.update_preview()
+
+        assert self.editor.print_image is not None, "Unable to generate printable image"
        
         if not self.ignore_printer:
           thread = PrintThread(
@@ -61,6 +63,10 @@ class CliPrint:
     def set_output_only(self, output: Optional[str]):
         self.output = output
         self.ignore_printer = output is not None
+
+    def open_file(self, file: str):
+        self.editor.current_file = file
+        self.editor.open()
 
     @staticmethod
     def _calculate_text_properties(font_name):
@@ -119,8 +125,15 @@ class CliPrint:
 
         config = dataclass_from_args(args, LabelMakerConfig)
         cli.set_label_maker_config(config)
-        cli.printables_from_args(args)
         cli.set_output_only(args.output)
+
+        match args.print_mode:
+            case "label":
+                cli.printables_from_args(args)
+            case "file":
+                cli.open_file(args.label_file_name)
+            case _:
+                raise NotImplementedError(f"{args.print_mode}")
 
         return cli
 

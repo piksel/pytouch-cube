@@ -77,6 +77,8 @@ def get_parser():
     print_modes = cli.add_subparsers(title="Print mode", dest="print_mode", required=True)
     label = print_modes.add_parser(
         "label", help="Configure printables", argument_default=argparse.SUPPRESS)
+    label_file = print_modes.add_parser(
+        "file", help="Open predefined label file that was generate from the UI")
 
     ### the printables arguments
     label.add_argument("-t", "--text", type=str, action=OrderArguments)
@@ -85,6 +87,10 @@ def get_parser():
     label.add_argument("-b", "--barcode", type=tuple_type_factory([str,str]), action=OrderArguments)
     label.add_argument("-l", "--labeled-barcode", type=tuple_type_factory([str,str]), action=OrderArguments)
     label.add_argument("-i", "--image", type=tuple_type_factory([str, int]), action=OrderArguments)
+
+    ## add argument for label file
+    label_file.add_argument("label_file_name", type=str)
+
 
     return parser
 
