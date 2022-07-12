@@ -195,13 +195,13 @@ class EditorWindow(QMainWindow):
         file_path, file_format = QFileDialog.getSaveFileName(
             self,
             caption='Save Label',
-            directory=save_initial_path,
+            directory=save_initial_path + "/mylabel.p3label",
             filter='Label Files (*.p3label)')
 
         if len(file_path) <= 0:
             return
 
-        self.current_file = file_path
+        self.current_file = str(file_path)
         self.save()
 
     def on_export(self):
@@ -232,7 +232,8 @@ class EditorWindow(QMainWindow):
             self,
             caption='Open Label',
             directory=open_initial_path,
-            filter='Label Files (*.p3label)')
+            filter='All (*);;Label Files (*.p3label)',
+            initialFilter="Label Files (*.p3label)")
 
         if len(file_path) <= 0:
             return
