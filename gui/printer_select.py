@@ -1,7 +1,7 @@
 from pprint import pprint
 
-from PyQt5.QtCore import QDir, Qt
-from PyQt5.QtWidgets import QComboBox
+from PyQt6.QtCore import QDir, Qt
+from PyQt6.QtWidgets import QComboBox
 from qasync import asyncSlot
 
 from labelmaker.comms import list_printer_devices
@@ -24,11 +24,11 @@ class PrinterSelect(QComboBox):
 #            candidate = await self.update_devfs()
 
         #if candidate is not None:
-        index = self.findText('PT-P3', Qt.MatchContains)
+        index = self.findText('PT-P3', Qt.MatchFlag.MatchContains)
         if index > 0:
             self.setCurrentIndex(index)
 
-        self.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
         self.adjustSize()
         # self.setMinimumWidth(self.minimumSizeHint().width())
 
@@ -59,7 +59,7 @@ class PrinterSelect(QComboBox):
         # printer_select.setExpanded(dev_index, True)
         # model_proxy.setFilterWildcard('tty*')
 
-        for p in QDir('/dev').entryList(['tty*', 'rfcomm*'], QDir.System, QDir.Name):
+        for p in QDir('/dev').entryList(['tty*', 'rfcomm*'], QDir.Filter.System, QDir.SortFlag.Name):
             if p.startswith('tty.') or p.startswith('rfcomm'):
                 device = '/dev/' + p
 

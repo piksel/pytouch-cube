@@ -1,8 +1,8 @@
 import logging
 from typing import Optional
 
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QTextEdit, QVBoxLayout, QWidget, QDialog, QPushButton
+from PyQt6.QtGui import QFont
+from PyQt6.QtWidgets import QTextEdit, QVBoxLayout, QWidget, QDialog, QPushButton
 
 
 class LogConsole(QTextEdit):
@@ -10,7 +10,7 @@ class LogConsole(QTextEdit):
         super().__init__(parent)
         self.setReadOnly(True)
         font = QFont('Fira')
-        font.setStyleHint(QFont.Monospace, QFont.PreferDefault)
+        font.setStyleHint(QFont.StyleHint.Monospace, QFont.StyleStrategy.PreferDefault)
         if hasattr(font, 'setFamilies'):
             font.setFamilies(['Fira', 'Source Code Pro', 'Monaco', 'Consolas', 'Monospaced', 'Courier'])
         self.setFont(font)

@@ -1,7 +1,7 @@
 from typing import Type, TypeVar, Optional
 
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QSpinBox, QLabel, QWidget, QLayout, \
+from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QSpinBox, QLabel, QWidget, QLayout, \
     QAbstractSpinBox, QDoubleSpinBox
 
 from margins import Margins
@@ -41,7 +41,7 @@ class QMarginsEdit(QWidget):
             rows_layout.addLayout(margins_layout)
             
             self.scale = self.create_box(rows_layout, 'Scale:', QPercentSpinBox)
-            self.scale.setStepType(QAbstractSpinBox.AdaptiveDecimalStepType)
+            self.scale.setStepType(QAbstractSpinBox.StepType.AdaptiveDecimalStepType)
             self.setLayout(rows_layout)
 
             self.boxes = [self.margin_top, self.margin_left, self.margin_right]

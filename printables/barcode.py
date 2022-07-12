@@ -1,8 +1,8 @@
 import barcode
-import traceback
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QImage, QPainter, QColor, QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import QLineEdit, QLabel, QComboBox, QCheckBox
+from typing import Optional
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QImage, QPainter, QColor, QStandardItemModel, QStandardItem
+from PyQt6.QtWidgets import QLineEdit, QLabel, QComboBox, QCheckBox
 from barcode.writer import BaseWriter
 from barcode.errors import *
 
@@ -92,7 +92,7 @@ class BarcodeWriter(BaseWriter):
         print('init', code)
         width, height = self.calculate_size(len(code[0]), len(code), self.dpi * 25)
         print(width, height)
-        image = QImage(width, USABLE_HEIGHT, QImage.Format_ARGB32)
+        image = QImage(width, USABLE_HEIGHT, QImage.Format.Format_ARGB32)
         image.fill(0xffffffff)
         self._painter = QPainter(image)
         self._image = image
@@ -119,14 +119,14 @@ class BarcodeWriter(BaseWriter):
         font = p.font()
         font.setPixelSize(self.text_size)
         p.setFont(font)
-        bounds = p.drawText(self._image.rect(), Qt.AlignBottom | Qt.AlignCenter, barcode_text)
+        bounds = p.drawText(self._image.rect(), Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignCenter, barcode_text)
         p.setBrush(QColor(0xffffffff))
         pen = p.pen()
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.drawRect(bounds)
         p.setPen(pen)
 
-        p.drawText(self._image.rect(), Qt.AlignBottom | Qt.AlignCenter, barcode_text)
+        p.drawText(self._image.rect(), Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignCenter, barcode_text)
 
     def _finish(self):
         self._painter.end()
@@ -137,7 +137,7 @@ class BarcodeWriter(BaseWriter):
 
 
 class Barcode(Printable):
-    def __init__(self, data: BarcodeData = None):
+    def __init__(self, data: Optional[BarcodeData] = None):
         if data is None:
             data = BarcodeData()
         self.data = data
@@ -160,8 +160,8 @@ class Barcode(Printable):
         try:
             print(d.code_type, d.text)
             img = barcode.generate(d.code_type, d.text, writer)
-        except (IllegalCharacterError, NumberOfDigitsError, WrongCountryCodeError) as x:
+        except BarcodeError as x:
             self.render_error = x
-            return QImage(0, 0, QImage.Format_ARGB32)
+            return QImage(0, 0, QImage.Format.Format_ARGB32)
 
         return img

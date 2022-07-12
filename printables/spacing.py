@@ -1,7 +1,8 @@
-from PyQt5.QtGui import QImage
-from PyQt5.QtWidgets import QLabel, QSpinBox
+from PyQt6.QtGui import QImage
+from PyQt6.QtWidgets import QLabel, QSpinBox
 
 from labelmaker import USABLE_HEIGHT
+from typing import Optional
 from margins import Margins
 from printables.printable import Printable, PrintableData
 from printables.propsedit import PropsEdit
@@ -51,7 +52,7 @@ class SpacingPropsEdit(PropsEdit):
 
 class Spacing(Printable):
 
-    def __init__(self, data: SpacingData = None):
+    def __init__(self, data: Optional[SpacingData] = None):
         if data is None:
             data = SpacingData()
         self.data = data
@@ -67,6 +68,6 @@ class Spacing(Printable):
 
         width = d.width
         print(width)
-        img = QImage(width, USABLE_HEIGHT, QImage.Format_ARGB32)
+        img = QImage(width, USABLE_HEIGHT, QImage.Format.Format_ARGB32)
         img.fill(0xffffffff)
         return img

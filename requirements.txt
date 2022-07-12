@@ -6,7 +6,7 @@ pypng
 appdirs~=1.4.4
 pyyaml~=5.4.0
 qrcode~=6.1
-qasync~=0.13.0
+qasync~=0.23.0
 setuptools~=41.2.0
 altgraph~=0.17
 pybluez~=0.23

@@ -1,7 +1,7 @@
 from pprint import pprint
 
-from PyQt5.QtCore import QDir, Qt
-from PyQt5.QtWidgets import QComboBox
+from PyQt6.QtCore import QDir, Qt
+from PyQt6.QtWidgets import QComboBox
 from qasync import asyncSlot
 
 from labels import tapes
@@ -30,7 +30,7 @@ class TapeSelect(QComboBox):
             self.model.add_tape(label, fg, bg)
         self.setModel(self.model)
 
-        index = self.findText('TZe-231,', Qt.MatchStartsWith)
+        index = self.findText('TZe-231,', Qt.MatchFlag.MatchStartsWith)
         if index > 0:
             self.setCurrentIndex(index)
 

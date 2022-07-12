@@ -1,11 +1,12 @@
 import logging
 from copy import copy
 
-from PyQt5.QtCore import Qt, QMargins
-from PyQt5.QtGui import QFont, QImage, QPainter, QFontMetrics
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QLabel, QPushButton, QFontDialog, QHBoxLayout, QSizePolicy, \
+from PyQt6.QtCore import Qt, QMargins
+from PyQt6.QtGui import QFont, QImage, QPainter, QFontMetrics
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QLabel, QPushButton, QFontDialog, QHBoxLayout, QSizePolicy, \
     QFontComboBox, QGroupBox, QSpinBox, QCheckBox
 
+from typing import Optional
 from labelmaker import USABLE_HEIGHT
 from margins import Margins
 from printables.printable import Printable, PrintableData
@@ -17,13 +18,13 @@ log = logging.getLogger(__name__)
 
 class TextData(PrintableData):
 
-    def __init__(self, text='', font_string=None, margins: Margins = None):
+    def __init__(self, text='', font_string=None, margins: Optional[Margins] = None):
         super().__init__(margins)
         self.text = text
 
         if font_string is None:
             font = QFont()
-            font.setStyleHint(QFont.Helvetica)
+            font.setStyleHint(QFont.StyleHint.Helvetica)
             if hasattr(font, 'setFamily'):
                 font.setFamily('Helvetica Neue')
 
@@ -68,11 +69,11 @@ class TextPropsEdit(PropsEdit):
         self.layout.addWidget(self.edit_text)
 
         self.button_font = QPushButton(self.get_font_name())
-        self.button_font.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.button_font.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.button_font.clicked.connect(self.button_font_clicked)
 
         button_default = QPushButton('Set as default', self)
-        button_default.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        button_default.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
         button_default.clicked.connect(self.default_clicked)
 
         font_layout = QVBoxLayout()
@@ -212,14 +213,14 @@ class Text(Printable):
         d = self.data
         font = QFont()
         font.fromString(d.font_string)
-        width = QFontMetrics(font).width(d.text)
+        width = QFontMetrics(font).horizontalAdvance(d.text)
         log.debug(f'Width: {width}, Font: {font}, Text: {d.text}')
-        img = QImage(width, USABLE_HEIGHT, QImage.Format_Mono)
+        img = QImage(width, USABLE_HEIGHT, QImage.Format.Format_Mono)
         img.fill(0xffffffff)
         p = QPainter(img)
         p.setFont(font)
         rect = img.rect() # .marginsRemoved(d.margins.getQMargins())
-        p.drawText(rect, Qt.AlignLeft | Qt.AlignHCenter, d.text)
+        p.drawText(rect, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignHCenter, d.text)
         p.end()
         del p
         return img

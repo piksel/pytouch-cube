@@ -11,6 +11,7 @@ __docformat__ = 'restructuredtext en'
 from barcode.base import Barcode
 from barcode.charsets import upc as _upc
 from barcode.errors import *
+from functools import reduce
 
 class UniversalProductCodeA(Barcode):
     """Initializes new UPC-A barcode.

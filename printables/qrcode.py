@@ -1,8 +1,8 @@
 import math
 
 import qrcode
-from PyQt5.QtGui import QImage, QPainter, QColor
-from PyQt5.QtWidgets import QLineEdit, QLabel
+from PyQt6.QtGui import QImage, QPainter, QColor
+from PyQt6.QtWidgets import QLineEdit, QLabel
 
 from labelmaker import USABLE_HEIGHT
 from printables.printable import PrintableData, Printable
@@ -58,7 +58,7 @@ class QrCode(Printable):
         qr.add_data(d.text)
         qr.make(fit=True)
 
-        img = QImage(USABLE_HEIGHT, USABLE_HEIGHT, QImage.Format_Mono)
+        img = QImage(USABLE_HEIGHT, USABLE_HEIGHT, QImage.Format.Format_Mono)
         img.fill(0xffffffff)
         with QPainter(img) as p:
 

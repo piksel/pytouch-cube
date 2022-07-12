@@ -1,7 +1,7 @@
 import logging
 import traceback
 
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt6.QtCore import QThread, pyqtSignal
 
 from labelmaker import LabelMaker, BUFFER_HEIGHT, PRINT_MARGIN
 

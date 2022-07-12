@@ -2,9 +2,9 @@
 import logging
 import pickle
 
-from PyQt5.QtCore import Qt, QRect, QPoint, QMargins, QModelIndex
-from PyQt5.QtGui import QPixmap, QImage, QPainter, QColor, QIcon, QBitmap
-from PyQt5.QtWidgets import QApplication, QVBoxLayout, QPushButton, QLabel, QFileDialog, QHBoxLayout, \
+from PyQt6.QtCore import Qt, QRect, QPoint, QMargins, QModelIndex
+from PyQt6.QtGui import QPixmap, QImage, QPainter, QColor, QIcon, QBitmap
+from PyQt6.QtWidgets import QApplication, QVBoxLayout, QPushButton, QLabel, QFileDialog, QHBoxLayout, \
     QGroupBox, QMessageBox, QMainWindow, QScrollArea, QSizePolicy
 
 from app import APP_NAME, APP_VERSION
@@ -72,7 +72,7 @@ class EditorWindow(QMainWindow):
         root = QVBoxLayout()
         items_layout = QHBoxLayout()
         items_layout.addWidget(sources)
-        items_layout.setAlignment(Qt.AlignLeft)
+        items_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
         sources.item_selected.connect(self.selected_item_changed)
         sources.items_changed.connect(self.items_changed)
@@ -114,14 +114,14 @@ class EditorWindow(QMainWindow):
         preview_container.setFixedHeight(USABLE_HEIGHT + 2)
         preview_wrapper.setContentsMargins(0, 0, 0, 0)
 
-        preview_wrapper.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        preview_wrapper.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        preview_wrapper.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        preview_wrapper.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         preview_wrapper.setWidgetResizable(True)
         layout.addWidget(preview_wrapper)
 
         # layout.addWidget(self.save_image_button)
         group.setLayout(layout)
-        group.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed))
+        group.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed))
 
         root.addWidget(group)
 
@@ -312,7 +312,7 @@ class EditorWindow(QMainWindow):
         item_renders = []
         item_preview_offsets = []
         width_needed = 0
-        bg_color = Qt.white
+        bg_color = Qt.GlobalColor.white
 
         items = self.sources.items.items
         for i, item in enumerate(items):
@@ -326,7 +326,7 @@ class EditorWindow(QMainWindow):
             margins = item.get_margins()
             src_rect = render.rect().marginsAdded(QMargins(margins.left, 0, margins.right, 0))
             sz = src_rect.size()
-            dst_rect = QRect(QPoint(), sz.scaled(sz * margins.scale, Qt.KeepAspectRatio))
+            dst_rect = QRect(QPoint(), sz.scaled(sz * margins.scale, Qt.AspectRatioMode.KeepAspectRatio))
             # dst_rect.marginsAdded(margins.getQMargins())
             dst_rect.translate(width_needed, margins.vert + ((USABLE_HEIGHT - dst_rect.height()) // 2))
             invert = self.needs_invert and item.get_type() in ['Image', 'Barcode', 'QRCode']
@@ -335,19 +335,19 @@ class EditorWindow(QMainWindow):
             item_preview_offsets.append(width_needed)
 
         x = 0
-        image = QImage(width_needed, USABLE_HEIGHT, QImage.Format_Mono)
+        image = QImage(width_needed, USABLE_HEIGHT, QImage.Format.Format_Mono)
         image.fill(bg_color)
         painter = QPainter(image)
-        painter.setBackgroundMode(Qt.OpaqueMode)
+        painter.setBackgroundMode(Qt.BGMode.OpaqueMode)
         for render, dst_rect, src_rect, invert in iter(item_renders):
             fill_rect = QRect(dst_rect.left(), 0, dst_rect.width(), USABLE_HEIGHT)
             painter.fillRect(fill_rect, bg_color)
             if invert:
-                painter.setBackground(Qt.black)
-                painter.setPen(Qt.white)
+                painter.setBackground(Qt.GlobalColor.black)
+                painter.setPen(Qt.GlobalColor.white)
             else:
-                painter.setBackground(Qt.white)
-                painter.setPen(Qt.black)
+                painter.setBackground(Qt.GlobalColor.white)
+                painter.setPen(Qt.GlobalColor.black)
             painter.drawPixmap(dst_rect, render, src_rect)
             x += fill_rect.width()
         painter.end()
