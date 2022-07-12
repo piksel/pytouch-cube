@@ -1,11 +1,13 @@
 import logging
 from typing import Optional
 
+from PyQt6.QtCore import pyqtSignal, pyqtBoundSignal
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QTextEdit, QVBoxLayout, QWidget, QDialog, QPushButton
 
-
 class LogConsole(QTextEdit):
+    log_signal = pyqtSignal(str)
+
     def __init__(self, parent: Optional[QWidget]):
         super().__init__(parent)
         self.setReadOnly(True)
@@ -15,9 +17,14 @@ class LogConsole(QTextEdit):
             font.setFamilies(['Fira', 'Source Code Pro', 'Monaco', 'Consolas', 'Monospaced', 'Courier'])
         self.setFont(font)
 
-        logging.root.addHandler(LogConsoleHandler(self))
+        self.log_signal.connect(self.print_message)
+        
+        logging.root.addHandler(LogConsoleHandler(self.log_signal))
         logging.root.setLevel(logging.INFO)
 
+    def print_message(self, message: str):
+        self.textCursor().insertText(message + "\n")
+        self.ensureCursorVisible()
 
     # def fmt_log(message):
     #     now = datetime.datetime.now()
@@ -48,17 +55,16 @@ class LogConsoleModal(QDialog):
         self.close_button.setDisabled(False)
 
     def log_message(self, message: str):
-        self.log_console.insertPlainText(message + "\n")
+        self.log_console.log_signal.emit(message)
 
     def on_close(self):
         self.close()
 
 
 class LogConsoleHandler(logging.Handler):
-    def __init__(self, log_console: LogConsole):
+    def __init__(self, log_handler: pyqtBoundSignal):
         super(LogConsoleHandler, self).__init__()
-        self.log_console = log_console
+        self.log_handler = log_handler
 
     def emit(self, record: logging.LogRecord):
-        self.log_console.insertPlainText(record.getMessage() + "\n")
-        self.log_console.ensureCursorVisible()
+        self.log_handler.emit(record.getMessage())

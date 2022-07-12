@@ -288,15 +288,14 @@ class EditorWindow(QMainWindow):
                 modal.log_message('Printing completed without any errors!\n')
             modal.enable_close()
 
+        
         log.info('Starting print thread...')
-        # modal.log_message(')
 
         print_device = self.printer_select.currentData()
 
         # print_device = self.printer_select.currentData(1)
         log.debug(f'Using device: {print_device}')
         self.print_thread = PrintThread(QImage(self.print_image), print_device)
-        # self.print_thread.log.connect(log)
         self.print_thread.done.connect(done)
 
         self.print_thread.start()
