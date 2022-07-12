@@ -3,7 +3,9 @@ import traceback
 
 from PyQt6.QtCore import QThread, pyqtSignal
 
+from typing import Optional
 from labelmaker import LabelMaker, BUFFER_HEIGHT, PRINT_MARGIN
+from labelmaker.config import LabelMakerConfig
 
 log = logging.getLogger(__name__)
 
@@ -12,8 +14,9 @@ class PrintThread(QThread):
     done = pyqtSignal('PyQt_PyObject')
     log = pyqtSignal('PyQt_PyObject')
 
-    def __init__(self, print_image, print_device):
+    def __init__(self, print_image, print_device, config: Optional[LabelMakerConfig] = None):
         QThread.__init__(self)
+        self.config = config
         self.print_image = print_image
         self.print_device = print_device
 
@@ -53,7 +56,7 @@ class PrintThread(QThread):
             log.info(
                 'Printing label, width: {0} height: {1}'.format(self.print_image.width(), self.print_image.height()))
 
-            lm = LabelMaker(self.print_device)
+            lm = LabelMaker(self.print_device, self.config)
             lm.print_label(buf)
             #self.print_device.test()
             self.done.emit(None)
