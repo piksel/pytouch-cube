@@ -4,6 +4,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QImage, QPainter, QColor, QStandardItemModel, QStandardItem
 from PyQt5.QtWidgets import QLineEdit, QLabel, QComboBox, QCheckBox
 from barcode.writer import BaseWriter
+from barcode.errors import *
 
 from labelmaker import USABLE_HEIGHT
 from printables.printable import Printable, PrintableData
@@ -157,8 +158,9 @@ class Barcode(Printable):
         writer = BarcodeWriter(self.data.draw_label)
         self.render_error = None
         try:
+            print(d.code_type, d.text)
             img = barcode.generate(d.code_type, d.text, writer)
-        except Exception as x:
+        except (IllegalCharacterError, NumberOfDigitsError, WrongCountryCodeError) as x:
             self.render_error = x
             return QImage(0, 0, QImage.Format_ARGB32)
 
