@@ -319,6 +319,7 @@ class EditorWindow(QMainWindow):
             render = QBitmap(item.render())
             render_error = item.get_render_error()
             if render_error is not None:
+                print(render_error)
                 continue
             # TODO: Decide how to present this to the user:
             #     QMessageBox.warning(self, 'Failed to render item', 'Failed to render item:\n' + str(render_error))
