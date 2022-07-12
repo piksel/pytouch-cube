@@ -92,7 +92,7 @@ def get_parser():
         "-s", "--spacing", help="Adds spacing. Argument should be int",
         type=int, action=OrderArguments)
     label.add_argument(
-        "-b", "--barcode", help="Add barcode delimited with ':' in the format DATA:BARCODE_TYPE"
+        "-b", "--barcode", help="Add barcode delimited with ':' in the format DATA:BARCODE_TYPE",
         type=tuple_type_factory([str,str]), action=OrderArguments)
     label.add_argument(
         "-l", "--labeled-barcode", help="Add barcode with label. See --barcode",
