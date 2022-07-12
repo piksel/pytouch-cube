@@ -2,8 +2,8 @@ import logging
 from enum import Enum
 from typing import *
 
-from PyQt5.QtCore import Qt, QAbstractItemModel, QModelIndex, QVariant
-from PyQt5.QtWidgets import QWidget
+from PyQt6.QtCore import Qt, QAbstractItemModel, QModelIndex, QVariant
+from PyQt6.QtWidgets import QWidget
 
 from printables.printable import Printable
 PrintableData = Union[QVariant, Printable]
@@ -40,20 +40,20 @@ class PrintablesModel(QAbstractItemModel):
     def hasChildren(self, parent: QModelIndex = ...) -> bool:
         return False
 
-    def setData(self, index: QModelIndex, value: PrintableData, role: Qt.ItemDataRole = Qt.EditRole) -> bool:
+    def setData(self, index: QModelIndex, value: PrintableData, role: Qt.ItemDataRole = Qt.ItemDataRole.EditRole) -> bool:
         return False
         # item = self.items[index.row()]
 
-    def data(self, index: QModelIndex, role: Qt.ItemDataRole = Qt.DisplayRole) -> Optional[PrintableData]:
+    def data(self, index: QModelIndex, role: Qt.ItemDataRole = Qt.ItemDataRole.DisplayRole) -> Optional[PrintableData]:
         if not index.isValid():
             return None
         item: Printable = index.internalPointer()
-        if role == Qt.DisplayRole:
+        if role == Qt.ItemDataRole.DisplayRole:
             if index.column() == 0:
                 return item.get_type()
             else:
                 return item.get_name()
-        if role == Qt.DecorationRole:
+        if role == Qt.ItemDataRole.DecorationRole:
             if index.column() == 0:
                 return item.get_icon()
             elif index.column() == 1:
@@ -61,15 +61,15 @@ class PrintablesModel(QAbstractItemModel):
                 if re is not None:
                     return Printable.get_error_icon()
 
-        if role == Qt.EditRole:
+        if role == Qt.ItemDataRole.EditRole:
             if index.column() == 1:
                 return item.get_name()
         return None
 
-    def headerData(self, section: int, orientation: Qt.Orientation, role: Qt.ItemDataRole = Qt.DisplayRole) -> QVariant:
-        if role == Qt.DisplayRole:
+    def headerData(self, section: int, orientation: Qt.Orientation, role: Qt.ItemDataRole = Qt.ItemDataRole.DisplayRole) -> QVariant:
+        if role == Qt.ItemDataRole.DisplayRole:
             try:
-                if orientation == Qt.Vertical:
+                if orientation == Qt.Orientation.Vertical:
                     return QVariant(str(section))
                 else:
                     return PrintablesModel.Columns(section).name
@@ -110,15 +110,15 @@ class PrintablesModel(QAbstractItemModel):
 
         return False
 
-    def flags(self, index: QModelIndex) -> Qt.ItemFlags:
+    def flags(self, index: QModelIndex) -> Qt.ItemFlag:
         default = super().flags(index)
-        return Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled | int(default)
+        return Qt.ItemFlag.ItemIsDragEnabled | Qt.ItemFlag.ItemIsDropEnabled | Qt.ItemFlag(default)
 
-    def supportedDragActions(self) -> Qt.DropActions:
-        return Qt.MoveAction
+    def supportedDragActions(self) -> Qt.DropAction:
+        return Qt.DropAction.MoveAction
 
-    def supportedDropActions(self) -> Qt.DropActions:
-        return Qt.MoveAction
+    def supportedDropActions(self) -> Qt.DropAction:
+        return Qt.DropAction.MoveAction
 
     def clear(self):
         log.debug(f'Clearing {len(self.items)} items')

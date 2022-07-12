@@ -1,7 +1,7 @@
 import logging
 
-from PyQt5.QtCore import pyqtSignal, QModelIndex
-from PyQt5.QtWidgets import QGroupBox, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QMenu
+from PyQt6.QtCore import pyqtSignal, QModelIndex
+from PyQt6.QtWidgets import QGroupBox, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QMenu
 
 from printables.printable import Printable
 from .item_view import ItemView

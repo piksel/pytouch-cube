@@ -1,9 +1,9 @@
 import os
 from typing import Optional
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QImage, QPainter, QPixmap, QIcon
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QLabel, QSlider, QHBoxLayout, QPushButton, QFileDialog
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QImage, QPainter, QPixmap, QIcon
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QLabel, QSlider, QHBoxLayout, QPushButton, QFileDialog
 
 from labelmaker import USABLE_HEIGHT
 from margins import Margins
@@ -15,7 +15,10 @@ class ImageData(PrintableData):
     source = ''
     threshold = 127
 
-    def __init__(self, image_source: str = None, threshold: int = 127, margins: Margins = None):
+    def __init__(
+            self, image_source: Optional[str] = None, 
+            threshold: int = 127, margins: Optional[Margins] = None
+    ):
         super().__init__(margins)
         self.source = image_source
         self.threshold = threshold
@@ -56,11 +59,11 @@ class ImagePropsEdit(PropsEdit):
         layout.addLayout(threshold)
         threshold.addWidget(QLabel('Threshold:'))
         thresh_value = QLabel(str(data.threshold))
-        thresh_value.setAlignment(Qt.AlignRight)
+        thresh_value.setAlignment(Qt.AlignmentFlag.AlignRight)
         threshold.addWidget(thresh_value)
         self.thresh_value = thresh_value
 
-        slider = QSlider(Qt.Horizontal, self)
+        slider = QSlider(Qt.Orientation.Horizontal, self)
         slider.setMinimum(1)
         slider.setMaximum(254)
         slider.setValue(data.threshold)
@@ -101,7 +104,7 @@ class ImagePropsEdit(PropsEdit):
 
 
 class Image(Printable):
-    def __init__(self, data: ImageData = None):
+    def __init__(self, data: Optional[ImageData] = None):
         super().__init__()
         if data is None:
             data = ImageData()
@@ -124,20 +127,20 @@ class Image(Printable):
         elif not os.path.isfile(self.data.source):
             return Image.get_generic_icon(False)
         img_source = QImage(self.data.source)
-        img = QImage(32, 32, QImage.Format_ARGB32)
+        img = QImage(32, 32, QImage.Format.Format_ARGB32)
         img.fill(0xffffffff)
 
         p = QPainter(img)
         p.drawRect(0, 0, 30, 30)
         if img_source.width() > img_source.height():
             scaled = img_source.scaledToWidth(32)
-            p.drawImage(0, 16 - (scaled.height() / 2), scaled)
+            p.drawImage(0, 16 - (scaled.height() // 2), scaled)
         else:
             scaled = img_source.scaledToHeight(32)
-            p.drawImage(16 - (scaled.width() / 2), 0, scaled)
+            p.drawImage(16 - (scaled.width() // 2), 0, scaled)
         p.end()
 
-        img = img.convertToFormat(QImage.Format_Mono)
+        img = img.convertToFormat(QImage.Format.Format_Mono)
 
         return QIcon(QPixmap.fromImage(img))
 
@@ -146,13 +149,13 @@ class Image(Printable):
         d = self.data
         if d.source is None:
             self.render_error = UserWarning('No image selected')
-            return QImage(0, USABLE_HEIGHT, QImage.Format_Mono)
+            return QImage(0, USABLE_HEIGHT, QImage.Format.Format_Mono)
         if not os.path.isfile(d.source):
             self.render_error = FileNotFoundError(f'Source file not found: {d.source}')
-            return QImage(0, USABLE_HEIGHT, QImage.Format_Mono)
+            return QImage(0, USABLE_HEIGHT, QImage.Format.Format_Mono)
         img_src = QImage(d.source)
         if img_src.hasAlphaChannel():
-            img = QImage(img_src.size(), QImage.Format_ARGB32)
+            img = QImage(img_src.size(), QImage.Format.Format_ARGB32)
             img.fill(0xffffffff)
             p = QPainter(img)
 
@@ -161,13 +164,13 @@ class Image(Printable):
         else:
             img = img_src
         # img.convertToFormat(QImage.Format_Mono)
-        img = img.scaledToHeight(USABLE_HEIGHT, Qt.FastTransformation)
+        img = img.scaledToHeight(USABLE_HEIGHT, Qt.TransformationMode.FastTransformation)
         rect = img.rect() # .marginsAdded(d.margins.getQMargins())
 
         max_x = img.width()
         max_y = USABLE_HEIGHT
 
-        bitmap = QImage(rect.width(), USABLE_HEIGHT, QImage.Format_Mono)
+        bitmap = QImage(rect.width(), USABLE_HEIGHT, QImage.Format.Format_Mono)
         for x in range(0, rect.width()):
             for y in range(0, USABLE_HEIGHT):
                 if x >= max_x or x <= 0 or y > max_y or y < 0:

@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QMargins
+from PyQt6.QtCore import QMargins
 
 
 class Margins:

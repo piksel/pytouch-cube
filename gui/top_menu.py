@@ -1,5 +1,5 @@
-from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QMenuBar, QAction, QWidget
+from PyQt6.QtGui import QKeySequence, QAction
+from PyQt6.QtWidgets import QMenuBar, QWidget
 
 from util import *
 from app import *
@@ -12,7 +12,7 @@ class TopMenu(QMenuBar):
         super().__init__(parent)
 
         about = QAction('About ' + APP_NAME, self)
-        about.setMenuRole(QAction.AboutRole)
+        about.setMenuRole(QAction.MenuRole.AboutRole)
 
         prefs = QAction('&Preferences', self)
 

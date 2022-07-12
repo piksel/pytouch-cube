@@ -4,7 +4,7 @@ import sys
 import os.path as path
 from sys import argv
 
-from PyQt5.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication
 from qasync import QEventLoop
 
 from gui import EditorWindow

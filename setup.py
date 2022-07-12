@@ -10,7 +10,7 @@ from util import *
 import app
 import site
 
-qt_plugin_root = site.getsitepackages()[1] + "\\PyQt5\\Qt\\plugins"
+qt_plugin_root = site.getsitepackages()[1] + "\\PyQt6\\Qt\\plugins"
 
 APP = 'pytouch3.py'
 data_files = [
@@ -18,7 +18,7 @@ data_files = [
 ]
 
 setup_requires = []
-requires = ['PyQt5', 'django-qrcode', 'pyserial', 'packbits', 'pypng', 'appdirs']
+requires = ['PyQt6', 'django-qrcode', 'pyserial', 'packbits', 'pypng', 'appdirs']
 kwargs = {}
 
 if is_mac:
@@ -54,9 +54,9 @@ setup(
         },
         'py2exe': {
             'includes': [
-                'PyQt5.sip',
-                'PyQt5.QtCore',
-                'PyQt5.QtGui'
+                'PyQt6.sip',
+                'PyQt6.QtCore',
+                'PyQt6.QtGui'
             ]
         }
     },

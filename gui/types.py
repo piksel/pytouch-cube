@@ -1,8 +1,8 @@
 from enum import Enum, auto
 from typing import *
 
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import QWidget
+from PyQt6.QtGui import QStandardItemModel, QStandardItem
+from PyQt6.QtWidgets import QWidget
 
 Color = Tuple[int, int, int]
 

@@ -1,6 +1,6 @@
-from PyQt5.QtCore import pyqtSignal, Qt, QModelIndex
-from PyQt5.QtGui import QDragEnterEvent, QDropEvent, QStandardItemModel
-from PyQt5.QtWidgets import QTreeView, QWidget, QTableView, QAbstractItemView, QHeaderView
+from PyQt6.QtCore import pyqtSignal, Qt, QModelIndex
+from PyQt6.QtGui import QDragEnterEvent, QDropEvent, QStandardItemModel
+from PyQt6.QtWidgets import QTreeView, QWidget, QTableView, QAbstractItemView, QHeaderView
 from typing import *
 
 from .printables_model import PrintablesModel
@@ -24,30 +24,30 @@ class ItemView(QTableView):
         # self.setDefaultDropAction(Qt.MoveAction)
         # self.setDragDropMode(QTreeView.InternalMove)
         # self.setItemsExpandable(False)
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
 
         self.setDragDropOverwriteMode(False)
         self.verticalHeader().hide()
-        self.setEditTriggers(QAbstractItemView.DoubleClicked)
+        self.setEditTriggers(QAbstractItemView.EditTrigger.DoubleClicked)
         # self.setDragDropMode(QAbstractItemView.InternalMove)
-        self.setDragDropMode(QAbstractItemView.InternalMove)
+        self.setDragDropMode(QAbstractItemView.DragDropMode.InternalMove)
         # self.row
 
         header = self.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(1, QHeaderView.Stretch)
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
 
     def item_from_index(self, index):
         return self.model().data(index)
 
     def dragEnterEvent(self, e: QDragEnterEvent) -> None:
-        self.draggedItem = self.indexAt(e.pos())
-        e.setDropAction(Qt.MoveAction)
+        self.draggedItem = self.indexAt(e.position().toPoint())
+        e.setDropAction(Qt.DropAction.MoveAction)
         super().dragEnterEvent(e)
 
     def dropEvent(self, e: QDropEvent) -> None:
-        dropped_index = self.indexAt(e.pos())
+        dropped_index = self.indexAt(e.position().toPoint())
         if not dropped_index.isValid():
             return
 

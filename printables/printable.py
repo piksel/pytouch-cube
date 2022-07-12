@@ -1,9 +1,9 @@
 import abc
 from typing import Optional
 import logging
-from PyQt5.QtCore import Qt, QLineF, QPointF
-from PyQt5.QtGui import QImage, QPainter, QColor, QIcon, QPixmap, QStandardItem, QPainterPath
-from PyQt5.QtWidgets import QLabel, QAction
+from PyQt6.QtCore import Qt, QLineF, QPointF
+from PyQt6.QtGui import QImage, QPainter, QColor, QIcon, QPixmap, QStandardItem, QPainterPath, QAction
+from PyQt6.QtWidgets import QLabel
 
 from margins import Margins
 
@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 class PrintableData:
     margins = Margins()
 
-    def __init__(self, margins: Margins = None):
+    def __init__(self, margins: Optional[Margins] = None):
         if margins is None:
             margins = Margins()
         self.margins = margins
@@ -65,7 +65,7 @@ class Printable(abc.ABC):
 
     @classmethod
     def get_generic_icon(cls, valid: bool = True) -> QIcon:
-        img = QImage(32, 32, QImage.Format_ARGB32)
+        img = QImage(32, 32, QImage.Format.Format_ARGB32)
         img.fill(QColor(200, 200, 200))
         with QPainter(img) as p:
             pen = p.pen()
@@ -78,14 +78,14 @@ class Printable(abc.ABC):
             font.setPixelSize(32)
             p.setFont(font)
 
-            p.drawText(img.rect(), Qt.AlignCenter, cls.get_letter())
+            p.drawText(img.rect(), Qt.AlignmentFlag.AlignCenter, cls.get_letter())
 
         return QIcon(QPixmap.fromImage(img))
 
     @classmethod
     def get_error_icon(cls) -> QIcon:
-        img = QImage(32, 32, QImage.Format_ARGB32)
-        img.fill(Qt.white)
+        img = QImage(32, 32, QImage.Format.Format_ARGB32)
+        img.fill(Qt.GlobalColor.white)
         with QPainter(img) as p:
             pen = p.pen()
             pen.setColor(QColor(0, 0, 0))
@@ -104,7 +104,7 @@ class Printable(abc.ABC):
             font.setPixelSize(26)
             p.setFont(font)
 
-            p.drawText(img.rect(), Qt.AlignCenter, '!')
+            p.drawText(img.rect(), Qt.AlignmentFlag.AlignCenter, '!')
 
         return QIcon(QPixmap.fromImage(img))
 

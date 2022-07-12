@@ -1,8 +1,10 @@
 import barcode
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QImage, QPainter, QColor, QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import QLineEdit, QLabel, QComboBox, QCheckBox
+from typing import Optional
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QImage, QPainter, QColor, QStandardItemModel, QStandardItem
+from PyQt6.QtWidgets import QLineEdit, QLabel, QComboBox, QCheckBox
 from barcode.writer import BaseWriter
+from barcode.errors import *
 
 from labelmaker import USABLE_HEIGHT
 from printables.printable import Printable, PrintableData
@@ -90,7 +92,7 @@ class BarcodeWriter(BaseWriter):
         print('init', code)
         width, height = self.calculate_size(len(code[0]), len(code), self.dpi * 25)
         print(width, height)
-        image = QImage(width, USABLE_HEIGHT, QImage.Format_ARGB32)
+        image = QImage(width, USABLE_HEIGHT, QImage.Format.Format_ARGB32)
         image.fill(0xffffffff)
         self._painter = QPainter(image)
         self._image = image
@@ -98,10 +100,10 @@ class BarcodeWriter(BaseWriter):
     def _create_module(self, xpos, _ypos, width, color):
         p = self._painter
         p.setBrush(QColor(color))
-        x1 = xpos * self.dpi
+        x1 = int(xpos * self.dpi)
         y1 = 0
-        x2 = width * self.dpi
-        y2 = USABLE_HEIGHT
+        x2 = int(width * self.dpi)
+        y2 = int(USABLE_HEIGHT)
         p.drawRect(x1, y1, x2, y2)
 
     def _create_text(self, _xpos, _ypos):
@@ -117,14 +119,14 @@ class BarcodeWriter(BaseWriter):
         font = p.font()
         font.setPixelSize(self.text_size)
         p.setFont(font)
-        bounds = p.drawText(self._image.rect(), Qt.AlignBottom | Qt.AlignCenter, barcode_text)
+        bounds = p.drawText(self._image.rect(), Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignCenter, barcode_text)
         p.setBrush(QColor(0xffffffff))
         pen = p.pen()
-        p.setPen(Qt.NoPen)
+        p.setPen(Qt.PenStyle.NoPen)
         p.drawRect(bounds)
         p.setPen(pen)
 
-        p.drawText(self._image.rect(), Qt.AlignBottom | Qt.AlignCenter, barcode_text)
+        p.drawText(self._image.rect(), Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignCenter, barcode_text)
 
     def _finish(self):
         self._painter.end()
@@ -135,7 +137,7 @@ class BarcodeWriter(BaseWriter):
 
 
 class Barcode(Printable):
-    def __init__(self, data: BarcodeData = None):
+    def __init__(self, data: Optional[BarcodeData] = None):
         if data is None:
             data = BarcodeData()
         self.data = data
@@ -156,9 +158,10 @@ class Barcode(Printable):
         writer = BarcodeWriter(self.data.draw_label)
         self.render_error = None
         try:
+            print(d.code_type, d.text)
             img = barcode.generate(d.code_type, d.text, writer)
-        except Exception as x:
+        except BarcodeError as x:
             self.render_error = x
-            return QImage(0, 0, QImage.Format_ARGB32)
+            return QImage(0, 0, QImage.Format.Format_ARGB32)
 
         return img
