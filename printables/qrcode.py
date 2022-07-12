@@ -71,6 +71,6 @@ class QrCode(Printable):
             for r in range(modcount):
                 for c in range(modcount):
                     if qr.modules[r][c]:
-                        p.fillRect(padding + (r*M), padding + (c*M), M, M, black)
+                        p.fillRect(int(padding + (r*M)), int(padding + (c*M)), M, M, black)
 
         return img

@@ -327,7 +327,7 @@ class EditorWindow(QMainWindow):
             sz = src_rect.size()
             dst_rect = QRect(QPoint(), sz.scaled(sz * margins.scale, Qt.KeepAspectRatio))
             # dst_rect.marginsAdded(margins.getQMargins())
-            dst_rect.translate(width_needed, margins.vert + ((USABLE_HEIGHT - dst_rect.height()) / 2))
+            dst_rect.translate(width_needed, margins.vert + ((USABLE_HEIGHT - dst_rect.height()) // 2))
             invert = self.needs_invert and item.get_type() in ['Image', 'Barcode', 'QRCode']
             item_renders.append((render, dst_rect, src_rect, invert))
             width_needed += dst_rect.width()

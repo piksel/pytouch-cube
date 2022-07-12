@@ -1,4 +1,5 @@
 import barcode
+import traceback
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QImage, QPainter, QColor, QStandardItemModel, QStandardItem
 from PyQt5.QtWidgets import QLineEdit, QLabel, QComboBox, QCheckBox
@@ -98,10 +99,10 @@ class BarcodeWriter(BaseWriter):
     def _create_module(self, xpos, _ypos, width, color):
         p = self._painter
         p.setBrush(QColor(color))
-        x1 = xpos * self.dpi
+        x1 = int(xpos * self.dpi)
         y1 = 0
-        x2 = width * self.dpi
-        y2 = USABLE_HEIGHT
+        x2 = int(width * self.dpi)
+        y2 = int(USABLE_HEIGHT)
         p.drawRect(x1, y1, x2, y2)
 
     def _create_text(self, _xpos, _ypos):
