@@ -9,3 +9,4 @@ qrcode~=6.1
 qasync~=0.13.0
 setuptools~=41.2.0
 altgraph~=0.17
+pybluez~=0.23
