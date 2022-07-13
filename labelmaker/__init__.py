@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 import logging
 import sys
+from typing import Optional
 
 from .encode import encode_raster_transfer, read_png
+from .config import LabelMakerConfig
 from labelmaker.comms import PrinterDevice, SerialPrinterDevice
 from labelmaker.format import Mode
 from labelmaker.status import Status
@@ -19,9 +21,17 @@ class LabelMaker:
     def log(self, m: str):
         log.info(m)
 
-    def __init__(self, serial_device: PrinterDevice):
+    def __init__(self, serial_device: PrinterDevice, config: Optional[LabelMakerConfig] = None):
         self.log('Opening serial device connection...')
+
+        self.config = config
+        if config is None:
+            self.config = LabelMakerConfig()
+
         self.ser = serial_device.open()
+
+    def set_config(self, config: LabelMakerConfig):
+        self.config = config
 
     def query_status(self):
         self.log("Query status...")
@@ -164,12 +174,12 @@ class LabelMaker:
 
         self.set_media_format(int(len(data) / 16), width=0xc0, length=0)
 
-        self.set_expanded_mode(chain_print=False)
+        self.config.apply(self.set_expanded_mode)
 
         # Set no mirror, no auto tape cut
-        self.set_modes(False, False)
+        self.config.apply(self.set_modes)
 
-        self.set_margin()
+        self.config.apply(self.set_margin)
 
         # Set compression mode: TIFF
         ser.write(b"\x4D\x02")

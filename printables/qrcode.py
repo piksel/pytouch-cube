@@ -1,4 +1,5 @@
 import math
+from typing import Optional
 
 import qrcode
 from PyQt6.QtGui import QImage, QPainter, QColor
@@ -36,9 +37,12 @@ class QrCodePropsEdit(PropsEdit):
 
 
 class QrCode(Printable):
-    def __init__(self):
+    def __init__(self, data: Optional[QrCodeData] = None):
         super().__init__()
-        self.data = QrCodeData()
+        if data is None:
+            data = QrCodeData()
+
+        self.data = data
 
     def get_margins(self):
         return self.data.margins

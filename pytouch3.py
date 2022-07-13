@@ -2,7 +2,6 @@ import asyncio
 import logging
 import sys
 import os.path as path
-from sys import argv
 
 from PyQt6.QtWidgets import QApplication
 from qasync import QEventLoop
@@ -13,13 +12,12 @@ from printables.barcode import BarcodeData, Barcode
 from printables.spacing import Spacing, SpacingData
 from printables.text import TextData, Text as TextItem
 from printables.image import ImageData, Image as ImageItem
+from cli import get_parser, CliPrint
 
 testdata = path.join(path.dirname(__file__) + '/testdata/')
 
 if not sys.gettrace() is None:
-    logging.basicConfig(level=logging.DEBUG
-
-                        )
+    logging.basicConfig(level=logging.DEBUG)
 
 
 def run(seed=False):
@@ -50,5 +48,14 @@ def run(seed=False):
         loop.run_forever()
 
 
+def main():
+    parser = get_parser()
+    args = parser.parse_args()
+    if args.runtime == "gui":
+        run("seed" in args and args.seed)
+    else:
+        CliPrint.run(args)
+
+
 if __name__ == '__main__':
-    run(seed='--seed' in argv)
+    main()

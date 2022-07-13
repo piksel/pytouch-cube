@@ -1,5 +1,7 @@
 import logging
 from copy import copy
+from string import ascii_letters
+from typing import Tuple
 
 from PyQt6.QtCore import Qt, QMargins
 from PyQt6.QtGui import QFont, QImage, QPainter, QFontMetrics
@@ -138,6 +140,7 @@ class TextPropsEdit(PropsEdit):
         else:
             font.setPixelSize(target_font_size)
         data.font_string = font.toString()
+        print(data.font_string)
 
         return data
 
@@ -166,20 +169,27 @@ class TextPropsEdit(PropsEdit):
             font = self.font_family.currentFont()
 
         if self.auto_size.isChecked():
-            font_size = self.font_size.value()
-            font.setPixelSize(font_size)
-            metrics = QFontMetrics(font)
-            rect = metrics.boundingRect(self.edit_text.text())
-            log.debug(f'Font: {font.family()}')
-            log.debug(f'Height: {rect.height()}, {rect.top()} <-> {rect.bottom()}, CapHeight: {metrics.capHeight()}')
-            log.debug(f'Ascent: {metrics.ascent()}, FontSize: {font_size}')
-            over_ascent = metrics.ascent() - font_size
-            log.debug(f'OverAscent: {over_ascent}')
-            adjusted_size = font_size - over_ascent
-            self.adjusted_size = adjusted_size
-            self.adjusted_size_label.setText('Adjusted size: {0}px'.format(adjusted_size))
+            self.adjusted_size = self.calc_adjusted_size_for_font(
+                font, self.font_size.value(), self.edit_text.text())
+            self.adjusted_size_label.setText(
+                f'Adjusted size: {self.adjusted_size}px')
         else:
             self.adjusted_size_label.setText('')
+
+    @staticmethod
+    def calc_adjusted_size_for_font(
+        font: QFont, font_size: int, text: str = ascii_letters
+    ) -> int:
+        font.setPixelSize(68)
+        metrics = QFontMetrics(font)
+        rect = metrics.boundingRect(text)
+        log.debug(f'Font: {font.family()}')
+        log.debug(f'Height: {rect.height()}, {rect.top()} <-> {rect.bottom()}, CapHeight: {metrics.capHeight()}')
+        log.debug(f'Ascent: {metrics.ascent()}, FontSize: {font_size}')
+        over_ascent = rect.height() - font_size
+        log.debug(f'OverAscent: {over_ascent}')
+        adjusted_size = font_size - over_ascent
+        return adjusted_size
 
     def button_font_clicked(self):
         font, ok = QFontDialog.getFont(self.data.getQFont(), self, "Select a font...")
