@@ -1,4 +1,3 @@
-import { env } from "process";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Dropdown, Form, Input } from "semantic-ui-react";
 import { Link } from "wouter";
@@ -35,6 +34,7 @@ const guiFonts = [
 
 export const TextItem: React.FC<TextItemProps> = (props) => {
     const {text, font, threshold, inverted} = props.data;
+    const {showDebugLines} = props;
     const [width, setWidth] = useState(200);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -84,7 +84,7 @@ export const TextItem: React.FC<TextItemProps> = (props) => {
         applyThreshold(ctx, props.color, threshold, false, props.data.mask);
 
         
-        if(env.NODE_ENV === 'development') {
+        if(showDebugLines) {
             ctx.moveTo(0, verticalOffset);
             ctx.lineTo(width, verticalOffset);
             ctx.moveTo(0, verticalOffset + textRect.fontBoundingBoxDescent);
@@ -99,7 +99,7 @@ export const TextItem: React.FC<TextItemProps> = (props) => {
             ctx.stroke();
         }
 
-    }, [canvasRef, width, text, font, threshold, inverted, props.color, props.data.mask]);
+    }, [canvasRef, width, text, font, threshold, inverted, props.color, props.data.mask, showDebugLines]);
 
 
     return (
@@ -150,13 +150,16 @@ export const TextItemEditor: React.FC<ItemEditorProps<TextItemData>> = (props) =
             setFontSize(s => bumpFontSize(s, 1));
         } else if (e.key === 'ArrowDown') {
             setFontSize(s => bumpFontSize(s, -1));
-        }
-        else console.log(e.key);
+        };
     }
 
     const handleFontWheel: React.WheelEventHandler<HTMLInputElement> = (e) => {
-        console.log(e.deltaY, e.deltaMode);
         setFontSize(s => bumpFontSize(s, e.deltaY < 0 ? 1 : -1));
+    }
+
+    const handleFontSizeChanged: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+        if (fontSize == e.target.valueAsNumber) return;
+        setFontSize(e.target.valueAsNumber);
     }
 
     const fontOptions = useMemo(() => {
@@ -180,9 +183,9 @@ export const TextItemEditor: React.FC<ItemEditorProps<TextItemData>> = (props) =
                         <label>Font</label>
                         <Dropdown selection search value={fontName} options={fontOptions} onChange={(_, d) => setFontName(d.value?.toString()) }  />
                     </Form.Field>
-                    <Form.Field width='6'>
+                    <Form.Field width='7'>
                         <label>Size</label>
-                        <Input type='number' value={fontSize} onKeyDownCapture={handleFontKeyDown} onWheel={handleFontWheel} labelPosition="right" label='px' />
+                        <Input type='number' value={fontSize} onChange={handleFontSizeChanged} onKeyDownCapture={handleFontKeyDown} onWheel={handleFontWheel} labelPosition="right" label='px' />
                     </Form.Field>
 
                 </Form.Group>

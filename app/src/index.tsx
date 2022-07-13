@@ -3,14 +3,17 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { createRoot } from 'react-dom/client';
 
 const ModeWrapper = process.env.STRICT_MODE === 'yes' ? React.StrictMode : React.Fragment;
+const container = document.getElementById('root');
+const root = createRoot(container!); 
 
-ReactDOM.render(
+root.render(
   <ModeWrapper>
     <App />
   </ModeWrapper>,
-  document.getElementById('root')
+  
 );
 
 // If you want to start measuring performance in your app, pass a function

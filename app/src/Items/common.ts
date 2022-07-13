@@ -43,6 +43,7 @@ export const applyThreshold = (ctx: CanvasRenderingContext2D, color: [number, nu
 export const getImageDim = (dim: number | SVGAnimatedLength) => typeof dim === 'number' ? dim : dim.baseVal.value;
 
 export interface ItemProps {
+    showDebugLines: boolean;
     color: [number, number, number];
 }
 

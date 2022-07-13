@@ -1,10 +1,10 @@
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { useForm } from "react-hook-form";
 import './App.scss';
-import 'semantic-ui-css/semantic.min.css';
+// import 'semantic-ui-css/semantic.min.css';
 import { ImageItem, ImageItemEditor, TextItemEditor, TextItem, LabelItemEditor } from './Items';
 import { ItemData, LabelItemData } from './Items/common';
-import { Button, Card, Container, Dropdown, Form, Header, Input, Loader, Menu, MenuItem, Popup, Radio, Segment } from 'semantic-ui-react';
+import { Button, Card, Checkbox, Container, Dropdown, Form, Header, Input, Loader, Menu, MenuItem, Popup, Radio, Segment } from 'semantic-ui-react';
 import { valueOptions } from './util';
 import { Link, Route } from 'wouter';
 import { FontsPage } from './Pages/FontsPage';
@@ -26,6 +26,7 @@ function App() {
 
   const [background, setBackground] = useState<string>("#ffffff");
   const [foreground, setForeground] = useState<string>("#000000");
+  const [showDebugLines, setShowDebugLines] = useState<boolean>(process.env.NODE_ENV === 'development');
 
   const labelColor: [number, number, number] = useMemo(() => (c => [(c >> 16) & 0xff, (c >> 8) & 0xff, c & 0xff])(parseInt(foreground.substring(1), 16)), [foreground])
 
@@ -61,18 +62,25 @@ function App() {
       </Route>
 
       <Route path={`${process.env.PUBLIC_URL}/label`}>
-        <FontLoader webFonts={webFonts} onError={(e: Error) => setError({title: 'Error loading font', message: e?.message})} />
+        <FontLoader webFonts={webFonts} onError={useCallback((e: Error) => setError({title: 'Error loading font', message: e?.message}), [setError])} />
 
 
 
       <Segment>
         <Header>Label editor
-          <div style={{float: 'right'}}><label>BG:
-          <input type='color' value={background} onChange={e => setBackground(e.target.value)}></input>
-            </label></div>
-            <div style={{float: 'right'}}><label>FG:
-          <input type='color' value={foreground} onChange={e => setForeground(e.target.value)}></input>
-            </label></div>
+
+
+          <div style={{float: 'right'}}>
+          <div style={{marginRight: '2ch', display: 'inline-block'}}>
+            <Checkbox checked={showDebugLines} onChange={() => setShowDebugLines(v => !v)} label='Show debug lines' />
+            </div>
+            <label>FG:
+          <input style={{marginLeft:'1ch'}}  type='color' value={foreground} onChange={e => setForeground(e.target.value)}></input>
+            </label>
+            <label style={{marginLeft: '2ch'}}>BG:
+          <input style={{marginLeft:'1ch'}} type='color' value={background} onChange={e => setBackground(e.target.value)}></input>
+            </label>
+          </div>
 
         </Header>
 
@@ -85,8 +93,8 @@ function App() {
           <div className={`label-item${selectedItem?.key === item.key?' selected':''}`}>{/* onClick={() => setSelectedItem(item)} */}
             <div className='indicator' />
           {
-            item.type === 'text' ? <TextItem data={item} color={labelColor} /> :
-            item.type === 'image' ? <ImageItem data={item}  color={labelColor} /> :
+            item.type === 'text' ? <TextItem showDebugLines={showDebugLines} data={item} color={labelColor} /> :
+            item.type === 'image' ? <ImageItem showDebugLines={showDebugLines}  data={item}  color={labelColor} /> :
             <div>Invalid item</div>
           }
             <div className='indicator' />
@@ -300,31 +308,58 @@ const FontLoader: React.FC<{webFonts: WebFont[], onError: ((error: Error) => voi
 
   const [loading, setLoading] = useState(true);
 
+  const loadedFonts = useRef<FontFace[]>([]);
+
   useEffect(() => {
-      const fontVariants = webFonts.flatMap(font => font.variants.map(v => {
+
+    const newFonts = webFonts.filter(ff => !loadedFonts.current.some(lf => lf.family === ff.family))
+      .flatMap(font => font.variants.map(v => {
           const source = new URL(font.files[v]);
+          const [, weight, style] = v.match(/([1-9]00)?(italic)?/) ?? [];
           source.protocol = document.location.protocol;
-          const fontFace = new FontFace(font.family, `URL(${source})`);
+          const fontFace = new FontFace(font.family, `URL(${source})`, {weight, style});
           console.log(`Loading font "${font.family}" (${v}) from ${source}`);
           return fontFace;
       }));
+    const keepFonts = loadedFonts.current.filter(ff => webFonts.some(lf => lf.family === ff.family));
+    const delFonts = loadedFonts.current.filter(ff => !webFonts.some(lf => lf.family === ff.family));
 
-      Promise.all(fontVariants.map(async ff => {
+    console.log("Fonts changed! New: %o Keep: %o Del: %o", newFonts.map(f => f.family), keepFonts.map(f => f.family), delFonts.map(f => f.family));
+
+    delFonts.forEach(fontFace => {
+        console.log(`Unloading "${fontFace.family} (${fontFace.variant})!`);
+        document.fonts.delete(fontFace);
+    });
+
+
+      // const fontVariants = webFonts.flatMap(font => font.variants.map(v => {
+      //     const source = new URL(font.files[v]);
+      //     source.protocol = document.location.protocol;
+      //     const fontFace = new FontFace(font.family, `URL(${source})`);
+      //     console.log(`Loading font "${font.family}" (${v}) from ${source}`);
+      //     return fontFace;
+      // }));
+
+      Promise.all(newFonts.map(async ff => {
         try {
           await ff.load();
-          console.log(`Loaded "${ff.family}"!`);
+          const variant = [ff.style, ff.weight].filter(t => t !== 'normal').join('/');
+          console.log(`Loaded font %o %s`, ff.family, variant || 'regular');
           document.fonts.add(ff);
         } catch(error) {
+          console.error("Failed to load font:", error)
           onError(error as Error);
         }
       })).then(() => setLoading(false));
 
-      return () => {
-          fontVariants.forEach(fontFace => {
-              console.log(`Unloading "${fontFace.family} // ${fontFace.featureSettings} // ${fontFace.style}!`);
-              document.fonts.delete(fontFace);
-          });
-      }
+      // return () => {
+      //     fontVariants.forEach(fontFace => {
+      //         console.log(`Unloading "${fontFace.family} // ${fontFace.featureSettings} // ${fontFace.style}!`);
+      //         document.fonts.delete(fontFace);
+      //     });
+      // }
+
+      loadedFonts.current = [...newFonts, ...keepFonts];
   }, [webFonts, onError]);
 
   return (

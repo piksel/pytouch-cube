@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { Checkbox, Label, Input, Pagination, Grid, Segment, Table, Header, SemanticCOLORS, SemanticWIDTHSNUMBER, Divider } from "semantic-ui-react";
 import { WebFont, AllFontCategories, WebFontListPayload, FontCategory } from "../fonts";
 import { StateSetter } from "../types";
@@ -57,6 +57,37 @@ export const FontsPage: React.FC<{webFonts: WebFont[], setWebFonts: StateSetter<
 
     const updateSelected = (font: WebFont, selected: boolean) => setWebFonts(wfs => [...wfs.filter(wf => wf.family !== font.family), ...(selected ? [font] : [])])
 
+    const previewFonts = useMemo(() => filteredFonts.filter((_, i) => i >= fontsPerPage * (activePage-1) && i < fontsPerPage * activePage), [filteredFonts, activePage, fontsPerPage]);
+
+    const loadedFonts = useRef<FontFace[]>([]);
+    useEffect(() => {
+        const allFonts = [...previewFonts, ...selectedFonts];
+        const newFonts = allFonts.filter(ff => !loadedFonts.current.some(lf => lf.family === ff.family))
+            .flatMap(font => font.variants.map(v => {
+                const source = new URL(font.files[v]);
+                source.protocol = document.location.protocol;
+                const fontFace = new FontFace(font.family, `URL(${source})`);
+                console.log(`Loading font "${font.family}" (${v}) from ${source}`);
+                fontFace.load().then(ff => {
+                    console.log(`Loaded "${font.family}" variant: ${v}!`);
+                    document.fonts.add(ff);
+                })
+                return fontFace;
+            }));
+        const keepFonts = loadedFonts.current.filter(ff => allFonts.some(lf => lf.family === ff.family));
+        const delFonts = loadedFonts.current.filter(ff => !allFonts.some(lf => lf.family === ff.family));
+
+        console.log("Fonts changed! New: %o Keep: %o Del: %o", newFonts.map(f => f.family), keepFonts.map(f => f.family), delFonts.map(f => f.family));
+
+        delFonts.forEach(fontFace => {
+            console.log(`Unloading "${fontFace.family} // ${fontFace.featureSettings} // ${fontFace.style}!`);
+            document.fonts.delete(fontFace);
+        });
+
+        loadedFonts.current = [...newFonts, ...keepFonts];
+
+    }, [selectedFonts, previewFonts])
+
     return (
         <>
         <Segment attached='top' loading={!fonts}>
@@ -103,7 +134,7 @@ export const FontsPage: React.FC<{webFonts: WebFont[], setWebFonts: StateSetter<
                         <Table.HeaderCell>{"Add:"}</Table.HeaderCell>
                         <Table.HeaderCell />
                     </Table.Row>
-                    {fonts && filteredFonts.filter((_, i) => i >= fontsPerPage * (activePage-1) && i < fontsPerPage * activePage).map((f, i) => 
+                    {fonts && previewFonts.map((f, i) => 
                         <FontTableRow key={f.family} selected={selected.includes(f.family)} onToggle={(checked) => updateSelected(f, true)} font={f} />
 
                     )}
@@ -172,23 +203,23 @@ const FontTableRow: React.FC<{font: WebFont, selected: boolean, onToggle: ((chec
 const FontPreview: React.FC<{font: WebFont, size: string}> = ({font, size}) => {
 
     useEffect(() => {
-        const fontVariants = font.variants.map(v => {
-            const source = new URL(font.files[v]);
-            source.protocol = document.location.protocol;
-            const fontFace = new FontFace(font.family, `URL(${source})`);
-            console.log(`Loading font "${font.family}" (${v}) from ${source}`);
-            fontFace.load().then(ff => {
-                console.log(`Loaded "${font.family}" variant: ${v}!`);
-                document.fonts.add(ff);
-            })
-            return fontFace;
-        });
+        // const fontVariants = font.variants.map(v => {
+        //     const source = new URL(font.files[v]);
+        //     source.protocol = document.location.protocol;
+        //     const fontFace = new FontFace(font.family, `URL(${source})`);
+        //     console.log(`Loading font "${font.family}" (${v}) from ${source}`);
+        //     fontFace.load().then(ff => {
+        //         console.log(`Loaded "${font.family}" variant: ${v}!`);
+        //         document.fonts.add(ff);
+        //     })
+        //     return fontFace;
+        // });
 
         return () => {
-            fontVariants.forEach(fontFace => {
-                console.log(`Unloading "${fontFace.family} // ${fontFace.featureSettings} // ${fontFace.style}!`);
-                document.fonts.delete(fontFace);
-            });
+            // fontVariants.forEach(fontFace => {
+            //     console.log(`Unloading "${fontFace.family} // ${fontFace.featureSettings} // ${fontFace.style}!`);
+            //     // document.fonts.delete(fontFace);
+            // });
         }
     }, [font.family, font.variants, font.files]);
 
