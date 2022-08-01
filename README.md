@@ -31,5 +31,17 @@ and run the app with
 python3 pytouch.py
 ```
 
+# Connecting to the device on linux
 
+After connecting to the device it will automatically disconnect again.
+On linux you can list the device by using bluetooth-ctl's paired-devices listing.
+e.g.
+```
+[bluetooth]# paired-devices
+Device EC:79:49:65:XX:XX PT-P300BTXXXX
+```
 
+You can then create an rfcom device from the bl address:
+```
+sudo rfcomm bind 0 EC:79:49:65:XX:XX 1
+```
