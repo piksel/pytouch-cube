@@ -37,11 +37,11 @@ class Settings:
 
         config_dir = ad.user_config_dir
         if not os.path.isdir(config_dir):
-            os.mkdirs(config_dir)
+            os.makedirs(config_dir)
 
         defaults_dir = os.path.join(config_dir, 'defaults')
         if not os.path.isdir(defaults_dir):
-            os.mkdirs(defaults_dir)
+            os.makedirs(defaults_dir)
 
         file_path = os.path.join(config_dir, 'settings.yml')
 

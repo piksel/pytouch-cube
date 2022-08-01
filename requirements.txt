@@ -1,3 +1,4 @@
+setuptools==57.0.0
 PyQt6>=6.3
 django-qrcode~=0.3
 pyserial~=3.4
@@ -7,6 +8,6 @@ appdirs~=1.4.4
 pyyaml~=5.4.0
 qrcode~=6.1
 qasync~=0.23.0
-setuptools~=41.2.0
 altgraph~=0.17
 pybluez~=0.23
+pyyaml
