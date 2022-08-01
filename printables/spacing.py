@@ -34,6 +34,7 @@ class SpacingPropsEdit(PropsEdit):
 
         self.edit_width = QSpinBox(self)
         self.edit_width.setValue(self.data.width)
+        self.edit_width.setMaximum(999)
         self.layout.addWidget(QLabel('Width:'))
         self.layout.addWidget(self.edit_width)
         self.edit_width.valueChanged.connect(self.on_width_changed)
