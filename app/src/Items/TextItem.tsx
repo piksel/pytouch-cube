@@ -158,7 +158,7 @@ export const TextItemEditor: React.FC<ItemEditorProps<TextItemData>> = (props) =
     }
 
     const handleFontSizeChanged: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-        if (fontSize == e.target.valueAsNumber) return;
+        if (fontSize === e.target.valueAsNumber) return;
         setFontSize(e.target.valueAsNumber);
     }
 
