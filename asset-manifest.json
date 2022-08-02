@@ -1,26 +1,15 @@
 {
   "files": {
-    "main.css": "/pytouch-cube/static/css/main.5f8787b6.chunk.css",
-    "main.js": "/pytouch-cube/static/js/main.24559e46.chunk.js",
-    "main.js.map": "/pytouch-cube/static/js/main.24559e46.chunk.js.map",
-    "runtime-main.js": "/pytouch-cube/static/js/runtime-main.0fc7a6b9.js",
-    "runtime-main.js.map": "/pytouch-cube/static/js/runtime-main.0fc7a6b9.js.map",
-    "static/css/2.61c6aa8f.chunk.css": "/pytouch-cube/static/css/2.61c6aa8f.chunk.css",
-    "static/js/2.d1f21680.chunk.js": "/pytouch-cube/static/js/2.d1f21680.chunk.js",
-    "static/js/2.d1f21680.chunk.js.map": "/pytouch-cube/static/js/2.d1f21680.chunk.js.map",
-    "static/js/3.35fdf9f6.chunk.js": "/pytouch-cube/static/js/3.35fdf9f6.chunk.js",
-    "static/js/3.35fdf9f6.chunk.js.map": "/pytouch-cube/static/js/3.35fdf9f6.chunk.js.map",
+    "main.css": "/pytouch-cube/static/css/main.16a7d973.css",
+    "main.js": "/pytouch-cube/static/js/main.b70c7277.js",
+    "static/js/787.a28eedca.chunk.js": "/pytouch-cube/static/js/787.a28eedca.chunk.js",
     "index.html": "/pytouch-cube/index.html",
-    "static/css/2.61c6aa8f.chunk.css.map": "/pytouch-cube/static/css/2.61c6aa8f.chunk.css.map",
-    "static/css/main.5f8787b6.chunk.css.map": "/pytouch-cube/static/css/main.5f8787b6.chunk.css.map",
-    "static/js/2.d1f21680.chunk.js.LICENSE.txt": "/pytouch-cube/static/js/2.d1f21680.chunk.js.LICENSE.txt",
-    "static/media/semantic.min.css": "/pytouch-cube/static/media/outline-icons.ddae9b1b.woff"
+    "main.16a7d973.css.map": "/pytouch-cube/static/css/main.16a7d973.css.map",
+    "main.b70c7277.js.map": "/pytouch-cube/static/js/main.b70c7277.js.map",
+    "787.a28eedca.chunk.js.map": "/pytouch-cube/static/js/787.a28eedca.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/runtime-main.0fc7a6b9.js",
-    "static/css/2.61c6aa8f.chunk.css",
-    "static/js/2.d1f21680.chunk.js",
-    "static/css/main.5f8787b6.chunk.css",
-    "static/js/main.24559e46.chunk.js"
+    "static/css/main.16a7d973.css",
+    "static/js/main.b70c7277.js"
   ]
 }
