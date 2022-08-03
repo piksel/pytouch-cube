@@ -9,4 +9,3 @@ qrcode~=6.1
 qasync~=0.23.0
 altgraph~=0.17
 git+https://github.com/pybluez/pybluez.git@37d7888#egg=pybluez; sys_platform == 'linux'
-pyyaml

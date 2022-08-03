@@ -13,6 +13,7 @@ To install the dependencies into a virtual env run
 python3 -m venv venv
 . venv/bin/activate
 ```
+
 Install the dependencies with
 ```
 python3 -m pip install -r requirements.txt
