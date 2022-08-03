@@ -1,4 +1,3 @@
-setuptools==57.0.0
 PyQt6>=6.3
 django-qrcode~=0.3
 pyserial~=3.4
@@ -9,5 +8,5 @@ pyyaml~=5.4.0
 qrcode~=6.1
 qasync~=0.23.0
 altgraph~=0.17
-pybluez~=0.23
+git+https://github.com/pybluez/pybluez.git@37d7888#egg=pybluez; sys_platform == 'linux'
 pyyaml
