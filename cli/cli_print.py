@@ -22,7 +22,7 @@ from printables.image import Image, ImageData
 
 class CliPrint:
     def __init__(self, device: str):
-        self.set_device(device)
+        self.device_name = device
         self.app = QApplication([])
         self.editor = EditorWindow(self.app)
         self.label_config = None
@@ -32,14 +32,16 @@ class CliPrint:
         logging.root.addHandler(logging.StreamHandler())
         logging.root.setLevel(logging.INFO)
 
-    def set_device(self, device: str):
-        if device == "auto":
-            dev = SerialPrinterDevice(SerialPrinterDevice.list_comports()[0])
+    def get_device(self):
+        dev = None
+        if self.device_name == "auto":
+            ports = SerialPrinterDevice.list_comports()
+            if len(ports) > 0:
+                dev = SerialPrinterDevice(SerialPrinterDevice.list_comports()[0])
         else:
-            dev =  SerialPrinterDevice.find(device)
-            assert dev is not None, "Could not find device"
+            dev =  SerialPrinterDevice.find(self.device_name)
 
-        self.device = dev
+        return dev
 
     def set_label_maker_config(self, config: LabelMakerConfig):
         self.label_config = config
@@ -53,10 +55,13 @@ class CliPrint:
         assert self.editor.print_image is not None, "Unable to generate printable image"
        
         if not self.ignore_printer:
-          thread = PrintThread(
-              QImage(self.editor.print_image), self.device, 
-              self.label_config)
-          thread.run()
+            device = self.get_device()
+            assert device is not None, f"Could not find device '{self.device_name}'"
+
+            thread = PrintThread(
+                QImage(self.editor.print_image), device, 
+                self.label_config)
+            thread.run()
         if self.output is not None:
             self.editor.print_image.save(self.output)
 

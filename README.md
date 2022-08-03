@@ -14,11 +14,6 @@ python3 -m venv venv
 . venv/bin/activate
 ```
 
-On Ubuntu 20.04 the pip3 version shipped is not able to install pyQt6. You might need to upgrade pip first.
-```
-pip install pip --upgrade
-```
-
 Install the dependencies with
 ```
 python3 -m pip install -r requirements.txt
