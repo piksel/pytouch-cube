@@ -13,14 +13,7 @@ To install the dependencies into a virtual env run
 python3 -m venv venv
 . venv/bin/activate
 ```
-
-PyBluez 0.23 in Version is incompatible with setuptools >=58.0.0
-Downgrade setuptools first with
-```
-python3 -m pip install setuptools==57.0.0
-```
-
-Then install the dependencies with
+Install the dependencies with
 ```
 python3 -m pip install -r requirements.txt
 ```
