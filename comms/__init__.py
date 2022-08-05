@@ -22,9 +22,6 @@ class PrinterDevice(abc.ABC):
         if name is None:
             name = address
         self.name = name
-        self.baudrate = 9600
-        self.stopbits = serial.STOPBITS_ONE
-        self.parity = serial.PARITY_NONE
         self.timeout = 10
 
     @abc.abstractmethod
