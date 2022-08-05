@@ -4,6 +4,7 @@ import logging
 from PyQt6.QtCore import Qt, QLineF, QPointF
 from PyQt6.QtGui import QImage, QPainter, QColor, QIcon, QPixmap, QStandardItem, QPainterPath, QAction
 from PyQt6.QtWidgets import QLabel
+from gui import icons
 
 from margins import Margins
 
@@ -65,48 +66,11 @@ class Printable(abc.ABC):
 
     @classmethod
     def get_generic_icon(cls, valid: bool = True) -> QIcon:
-        img = QImage(32, 32, QImage.Format.Format_ARGB32)
-        img.fill(QColor(200, 200, 200))
-        with QPainter(img) as p:
-            pen = p.pen()
-            pen.setColor(QColor(0, 0, 0) if valid else QColor(255, 0, 0))
-            p.setPen(pen)
-
-            p.drawRect(1, 1, 30, 30)
-
-            font = p.font()
-            font.setPixelSize(32)
-            p.setFont(font)
-
-            p.drawText(img.rect(), Qt.AlignmentFlag.AlignCenter, cls.get_letter())
-
-        return QIcon(QPixmap.fromImage(img))
+        return icons.get_generic_icon(cls.__name__[0], valid)
 
     @classmethod
     def get_error_icon(cls) -> QIcon:
-        img = QImage(32, 32, QImage.Format.Format_ARGB32)
-        img.fill(Qt.GlobalColor.white)
-        with QPainter(img) as p:
-            pen = p.pen()
-            pen.setColor(QColor(0, 0, 0))
-            p.setPen(pen)
-
-            mn, md, mx = 1, 15.5, 30
-            triangle = QPainterPath(QPointF(mn, mx))
-            triangle.lineTo(QPointF(md, mn))
-            triangle.lineTo(QPointF(mx, mx))
-            triangle.lineTo(QPointF(mn, mx))
-
-            p.fillPath(triangle, QColor(255, 197, 74))
-            p.drawPath(triangle)
-
-            font = p.font()
-            font.setPixelSize(26)
-            p.setFont(font)
-
-            p.drawText(img.rect(), Qt.AlignmentFlag.AlignCenter, '!')
-
-        return QIcon(QPixmap.fromImage(img))
+        return icons.get_error_icon()
 
     def get_icon(self) -> QIcon:
         return self.__class__.get_generic_icon()

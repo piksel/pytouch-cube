@@ -1,85 +1,29 @@
 from __future__ import annotations
 
 import logging
-from pprint import pprint
 from typing import *
+from gui import icons
+from comms import PrinterDevice
 from util import *
-
-import abc
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QImage, QPainter, QColor, QIcon, QPixmap
 import serial
-import bluetooth
 from serial.tools.list_ports_common import ListPortInfo
 
-BluetoothDeviceInfo = Tuple[str, str, str]
+STOPBITS_ONE = serial.STOPBITS_ONE
+PARITY_NONE = serial.PARITY_NONE
 
 log = logging.getLogger(__name__)
-
-
-class PrinterDevice(abc.ABC):
-    def __init__(self, name):
-        self.name = name
-        self.baudrate = 9600
-        self.stopbits = serial.STOPBITS_ONE
-        self.parity = serial.PARITY_NONE
-        self.timeout = 10
-
-    @abc.abstractmethod
-    def open(self):
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    async def list_devices(cls) -> List[Tuple[str, PrinterDevice]]:
-        pass
-
-
-class BluetoothPrinterDevice(PrinterDevice):
-    def __init__(self, address: str, service=None, name=None):
-        if name is None:
-            name = address
-        super().__init__(name)
-        self.address = address
-
-    @classmethod
-    async def list_devices(cls) -> List[Tuple[str, PrinterDevice]]:
-        devices = bluetooth.discover_devices(1, flush_cache=False, lookup_names=True, lookup_class=True)
-
-        return [(name if not None else address, BluetoothPrinterDevice(address, service)) for address, name, service in
-                devices]
-
-    def test(self):
-        log.info(f'Scanning {self.address} for services...')
-        service_matches = bluetooth.find_service(address=self.address)
-
-        first_match = service_matches[0]
-
-        port = first_match["port"]
-        name = first_match["name"]
-        host = first_match["host"]
-
-    def open(self):
-        service_matches = bluetooth.find_service(address=self.address)
-
-        first_match = service_matches[0]
-
-        port = first_match["port"]
-        name = first_match["name"]
-        host = first_match["host"]
-
-        socket = bluetooth.BluetoothSocket()
-        socket.connect((host, port))
-        return socket
-
 
 class SerialPrinterDevice(PrinterDevice):
 
     def __init__(self, port_info: ListPortInfo, name=None):
         if name is None:
-            name = port_info.name
-        super().__init__(name)
+            name = port_info.product
+        super().__init__(port_info.name, name)
         self.port_info = port_info
 
-    def open(self):
+    def open(self) -> IO[bytes]:
         return serial.Serial(
             self.port_info.device,
             baudrate=self.baudrate,
@@ -100,13 +44,15 @@ class SerialPrinterDevice(PrinterDevice):
 
     @classmethod
     async def list_devices(cls) -> List[Tuple[str, SerialPrinterDevice]]:
-        return [(it.name if it.name is not None else it.device, SerialPrinterDevice(it)) for it in cls.list_comports()]
+        nd = [(f"{it.product if it.product is not None else it.name} ({it.device})", it) 
+            for it in cls.list_comports()]
+        return [(name, SerialPrinterDevice(it, name)) for name, it in nd]
 
     @classmethod
     def list_comports(cls) -> List[ListPortInfo]:
         if is_mac:
             from serial.tools.list_ports_osx import GetIOServicesByType, GetParentDeviceByType, get_string_property
-            from mac_bt import get_bytes_property, IOBluetooth
+            from mac.bluetooth import get_bytes_property, IOBluetooth
 
             services = GetIOServicesByType('IOSerialBSDClient')
             ports = []
@@ -138,7 +84,7 @@ class SerialPrinterDevice(PrinterDevice):
             return ports
         else:
             if is_win:
-                from wmi import WMI
+                from wmi import WMI # type: ignore
                 from serial.tools.list_ports_windows import comports
 
                 wmi = WMI()
@@ -162,7 +108,10 @@ class SerialPrinterDevice(PrinterDevice):
                 from serial.tools.list_ports_posix import comports as list_comports
                 return list_comports()
 
+    def __str__(self) -> str:
+        return f"[{self.address}]: {self.name}"
 
-async def list_printer_devices() -> List[Tuple[str, PrinterDevice]]:
-    # return await BluetoothPrinterDevice.list_devices()
-    return await SerialPrinterDevice.list_devices()
+    @classmethod
+    def get_icon(cls) -> QIcon:
+        # return icons.get_bluetooth_icon()
+        return icons.get_generic_icon(cls.__name__[0])

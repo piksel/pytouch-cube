@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import asyncio
 import logging
 import pickle
 
@@ -6,10 +7,11 @@ from PyQt6.QtCore import Qt, QRect, QPoint, QMargins, QModelIndex
 from PyQt6.QtGui import QPixmap, QImage, QPainter, QColor, QIcon, QBitmap
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QPushButton, QLabel, QFileDialog, QHBoxLayout, \
     QGroupBox, QMessageBox, QMainWindow, QScrollArea, QSizePolicy
+import qasync
 
 from app import APP_NAME, APP_VERSION
-from labelmaker import USABLE_HEIGHT
-from print_thread import PrintThread
+from labelmaker.const import USABLE_HEIGHT
+from gui.print_thread import PrintThread
 from printables.printable import Printable
 from printables.propsedit import PropsEdit
 from settings import Settings
@@ -131,6 +133,9 @@ class EditorWindow(QMainWindow):
         bottom_bar = QHBoxLayout()
         bottom_bar.addWidget(QLabel('Print device:'))
         bottom_bar.addWidget(self.printer_select)
+        update_devices = QPushButton("Update", self)
+        update_devices.clicked.connect(self.printer_select.update)
+        bottom_bar.addWidget(update_devices)
 
         self.tape_select = TapeSelect(self)
         self.tape_select.currentIndexChanged.connect(self.on_tape_changed)
@@ -274,6 +279,10 @@ class EditorWindow(QMainWindow):
 
     def preview_item_clicked(self, index: int):
         self.sources.table.selectRow(index)
+
+    def update_devices_clicked(self):
+        #qasync.QEventLoop.create_task()
+        asyncio.create_task(self.printer_select.update())
 
     def print_clicked(self):
 
