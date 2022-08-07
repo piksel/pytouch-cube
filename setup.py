@@ -6,33 +6,35 @@ Usage:
 """
 
 from setuptools import setup
-from util import *
-import app
-import site
+import site, os, re, sys
 
-qt_plugin_root = site.getsitepackages()[1] + "\\PyQt6\\Qt\\plugins"
+with open(os.path.join('src', 'pytouch_cube', '__init__.py'), encoding='utf-8') as f:
+    version = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", f.read(), re.M).group(1)
 
-APP = 'pytouch3.py'
+if not version:
+    raise RuntimeError('Failed to parse version information')
+
 data_files = [
     ('', ['pytouch3.png']),
 ]
 
-setup_requires = []
-requires = ['PyQt6', 'django-qrcode', 'pyserial', 'packbits', 'pypng', 'appdirs']
+setup_requires = ['setuptools>=61']
+requires = ['PyQt6', 'django-qrcode', 'pyserial', 'packbits', 'pypng', 'appdirs', 'qasync']
 kwargs = {}
 
-if is_mac:
-    setup_requires = ['py2app']
-elif is_win:
+if sys.argv[1:2] == ['py2app']:
+    setup_requires.append('py2app')
+elif sys.argv[1:2] == ['py2exe']:
+    qt_plugin_root = site.getsitepackages()[1] + "\\PyQt6\\Qt\\plugins"
     kwargs = {
         "windows": [{
-            "script": APP[0],
+            "script": 'pytouch-cube/__init__.py',
             "icon_resources": [(0, "pytouch3.ico")],
             "dest_base": "pytouch3"
         }],
     }
-    setup_requires = ['py2exe~=0.10.2.1']
-    requires += ['wmi']
+    setup_requires.append('py2exe~=0.10.2.1')
+    requires.append('wmi')
     data_files += [
         ("platforms", [ qt_plugin_root + "\\platforms\\qwindows.dll"]),
         ("iconengines", [qt_plugin_root + "\\iconengines\\qsvgicon.dll"]),
@@ -42,11 +44,11 @@ elif is_win:
 else:
     pass
 
+
 setup(
-    name=app.APP_NAME,
-    version=app.APP_VERSION,
-    author=app.APP_AUTHOR,
-    app=[APP],
+    name='pytouch-cube',
+    version=version,
+    author='piksel bitworks',
     data_files=data_files,
     options={
         'py2app': {
@@ -60,8 +62,16 @@ setup(
             ]
         }
     },
-
     setup_requires=setup_requires,
     install_requires=requires,
+    package_dir={'': 'src'},
+    packages=[
+        'pytouch_cube',
+        'pytouch_cube.cli', 
+        'pytouch_cube.gui', 
+        'pytouch_cube.printing',
+        'pytouch_cube.printables',
+        'barcode',
+        'barcode.charsets'],
     **kwargs
 )
