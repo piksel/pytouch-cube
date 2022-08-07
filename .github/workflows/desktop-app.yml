@@ -38,7 +38,14 @@ jobs:
       run: |
         bash build.sh ${{ matrix.os }}
     - name: Upload package artifact
+      if: matrix.os != 'macos'
       uses: actions/upload-artifact@v2
       with:
         name: pytouch-cube-${{ matrix.os }}
         path: dist/pytouch-cube/*
+    - name: Upload app bundle artifact (macOS)
+      if: matrix.os == 'macos'
+      uses: actions/upload-artifact@v2
+      with:
+        name: pytouch-cube-${{ matrix.os }}
+        path: dist/*.app
