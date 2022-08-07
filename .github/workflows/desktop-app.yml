@@ -31,7 +31,7 @@ jobs:
         pip install .
     - name: Build package
       run: |
-        ./build.sh
+        bash build.sh
     - name: Upload package artifact
       uses: actions/upload-artifact@v2
       with:
