@@ -3,9 +3,14 @@ APP_SCRIPT='src/pytouch_cube/__main__.py'
 ICON='pytouch3.ico'
 IMG_DATA="pytouch3.png:."
 
-if [ "$1" == "windows" ]; then
-    IMG_DATA=$(echo "$IMG_DATA" | tr ':' ';')
-fi
+case "$1" in
+    "windows")
+        IMG_DATA=$(echo "$IMG_DATA" | tr ':' ';')
+        ;;
+    "macos")
+        ICON="pytouch3.icns"
+        ;;
+esac
 
 VER=$(git describe || echo "0.10-${GITHUB_EVENT_NAME:-build}")
 
