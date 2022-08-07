@@ -8,8 +8,8 @@ Usage:
 from setuptools import setup
 import site, os, re, sys
 
-with open(os.path.join('src', 'pytouch_cube', '__init__.py'), encoding='utf-8') as f:
-    version = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", f.read(), re.M).group(1)
+with open(os.path.join('src', 'pytouch_cube', 'version.py'), encoding='utf-8') as f:
+    version = re.search(r"^APP_VERSION = ['\"]([^'\"]*)['\"]", f.read(), re.M).group(1)
 
 if not version:
     raise RuntimeError('Failed to parse version information')
