@@ -31,7 +31,7 @@ jobs:
         pip install .
     - name: Build package
       run: |
-        bash build.sh
+        bash build.sh ${{ matrix.os }}
     - name: Upload package artifact
       uses: actions/upload-artifact@v2
       with:
