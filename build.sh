@@ -3,7 +3,11 @@ APP_SCRIPT='src/pytouch_cube/__main__.py'
 ICON='pytouch3.ico'
 IMG_DATA="pytouch3.png:."
 
-VER=$(git describe --all)
+if [ "$1" == "windows" ]; then
+    IMG_DATA=$(echo "$IMG_DATA" | tr ':' ';')
+fi
+
+VER=$(git describe)
 
 echo "APP_VERSION = '$VER'" > src/pytouch_cube/version.py
 
