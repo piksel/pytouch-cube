@@ -168,8 +168,8 @@ class EditorWindow(QMainWindow):
         await self.printer_select.update()
 
     def on_new(self):
-        self.items.clear()
-        self.update_items()
+        self.sources.items.clear()
+        self.update_current_item()
         self.update_preview()
 
     def on_about(self):
