@@ -1,6 +1,6 @@
 [project]
 name = "pytouch-cube"
-version = "1.0.0-rc3"
+version = "0.10.0"
 authors = [
   { name="nils måsén", email="nils@piksel.se" },
   { name="Mimoja", email="git@mimoja.de" },
@@ -26,7 +26,7 @@ dependencies = [
     'qrcode~=6.1',
     'qasync~=0.23.0',
     'altgraph~=0.17',
-    # 'pybluez @ git+https://github.com/pybluez/pybluez.git@37d7888',
+    'pybluez @ git+https://github.com/pybluez/pybluez.git@37d7888',
 ]
 
 [project.urls]

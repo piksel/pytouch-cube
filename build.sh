@@ -7,7 +7,7 @@ if [ "$1" == "windows" ]; then
     IMG_DATA=$(echo "$IMG_DATA" | tr ':' ';')
 fi
 
-VER=$(git describe)
+VER=$(git describe || echo "0.10-${GITHUB_EVENT_NAME:-build}")
 
 echo "APP_VERSION = '$VER'" > src/pytouch_cube/version.py
 
@@ -16,6 +16,7 @@ cat src/pytouch_cube/version.py
 echo
 
 pyinstaller \
+    --windowed \
     --add-data="$IMG_DATA" \
     --icon="$ICON" \
     --name pytouch-cube \

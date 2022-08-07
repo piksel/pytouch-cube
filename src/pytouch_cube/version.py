@@ -1,1 +1,1 @@
-APP_VERSION = 'v1.0.0-rc2-45-g76aa186'
+APP_VERSION = 'v0.10.0-git'
