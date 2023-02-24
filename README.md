@@ -22,7 +22,7 @@ python3 -m pip install -r requirements.txt
 and run the app with
 
 ```
-python3 pytouch.py
+python3 pytouch3.py
 ```
 
 # Connecting to the device on linux
