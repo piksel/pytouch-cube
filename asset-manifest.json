@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/pytouch-cube/static/css/main.16a7d973.css",
-    "main.js": "/pytouch-cube/static/js/main.6c62340c.js",
+    "main.js": "/pytouch-cube/static/js/main.fda0295c.js",
     "static/js/787.a28eedca.chunk.js": "/pytouch-cube/static/js/787.a28eedca.chunk.js",
     "index.html": "/pytouch-cube/index.html",
     "main.16a7d973.css.map": "/pytouch-cube/static/css/main.16a7d973.css.map",
-    "main.6c62340c.js.map": "/pytouch-cube/static/js/main.6c62340c.js.map",
+    "main.fda0295c.js.map": "/pytouch-cube/static/js/main.fda0295c.js.map",
     "787.a28eedca.chunk.js.map": "/pytouch-cube/static/js/787.a28eedca.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.16a7d973.css",
-    "static/js/main.6c62340c.js"
+    "static/js/main.fda0295c.js"
   ]
 }
