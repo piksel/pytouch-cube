@@ -1,0 +1,46 @@
+[project]
+name = "pytouch-cube"
+version = "0.10.0"
+authors = [
+  { name="nils måsén", email="nils@piksel.se" },
+  { name="Mimoja", email="git@mimoja.de" },
+  { name="Sophie Tyalie", email="dev@flowerpot.me" },
+]
+description = "Qt6 Label Editor for Brother P-Touch Cube label maker"
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    'PyQt6>=6.3',
+    'django-qrcode~=0.3',
+    'pyserial~=3.4',
+    'packbits~=0.6',
+    'pypng',
+    'appdirs~=1.4.4',
+    'pyyaml~=5.4.0',
+    'qrcode~=6.1',
+    'qasync~=0.23.0',
+    'altgraph~=0.17',
+    'pybluez @ git+https://github.com/pybluez/pybluez.git@37d7888',
+]
+
+[project.urls]
+"Homepage" = "https://github.com/piksel/pytouch-cube"
+"Bug Tracker" = "https://github.com/piksel/pytouch-cube/issues"
+
+[project.gui-scripts]
+pytouch-cube = "pytouch_cube:main"
+
+[project.scripts]
+pytouch-cube = "pytouch_cube:main"
+
+[build-system]
+requires = [
+  "setuptools>=61.0",
+  ]
+build-backend = "setuptools.build_meta"
