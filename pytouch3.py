@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import asyncio
 import logging
 import sys
@@ -5,8 +7,9 @@ import os.path as path
 
 from PyQt6.QtWidgets import QApplication
 from qasync import QEventLoop
+from cli.cli_devices import CliDevices
 
-from gui import EditorWindow
+from gui.editor_window import EditorWindow
 from margins import Margins
 from printables.barcode import BarcodeData, Barcode
 from printables.spacing import Spacing, SpacingData
@@ -22,6 +25,9 @@ if not sys.gettrace() is None:
 
 def run(seed=False):
     app = QApplication(sys.argv)
+    loop = QEventLoop(app)
+    asyncio.set_event_loop(loop)
+
     editor = EditorWindow(app)
     editor.show()
 
@@ -39,10 +45,9 @@ def run(seed=False):
                                                                     right=15,
                                                                     scale=1))))
 
-    loop = QEventLoop(app)
-    asyncio.set_event_loop(loop)
 
-    asyncio.create_task(editor.init_async())
+
+    asyncio.run_coroutine_threadsafe(editor.init_async(), loop)
 
     with loop:
         loop.run_forever()
@@ -53,6 +58,8 @@ def main():
     args = parser.parse_args()
     if args.runtime == "gui":
         run("seed" in args and args.seed)
+    elif args.runtime == "devices":
+        CliDevices.run(args)
     else:
         CliPrint.run(args)
 

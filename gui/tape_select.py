@@ -5,7 +5,6 @@ from PyQt6.QtWidgets import QComboBox
 from qasync import asyncSlot
 
 from labels import tapes
-from labelmaker.comms import list_printer_devices
 from util import *
 from .types import *
 

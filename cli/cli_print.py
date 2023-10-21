@@ -7,10 +7,10 @@ from PyQt6.QtGui import QImage, QFont, QFontMetrics
 
 from .arguments import dataclass_from_args
 from printables.printable import Printable
-from labelmaker.comms import SerialPrinterDevice
+import comms
 from labelmaker.config import LabelMakerConfig
 from gui.editor_window import EditorWindow
-from print_thread import PrintThread
+from gui.print_thread import PrintThread
 
 from margins import Margins
 from printables.printable import Printable
@@ -21,8 +21,9 @@ from printables.barcode import Barcode, BarcodeData
 from printables.image import Image, ImageData
 
 class CliPrint:
-    def __init__(self, device: str):
+    def __init__(self, device: str, device_type: str):
         self.device_name = device
+        self.device_type = device_type
         self.app = QApplication([])
         self.editor = EditorWindow(self.app)
         self.label_config = None
@@ -32,15 +33,12 @@ class CliPrint:
         logging.root.addHandler(logging.StreamHandler())
         logging.root.setLevel(logging.INFO)
 
-    def get_device(self):
+    def get_device(self) -> comms.PrinterDevice | None:
         dev = None
         if self.device_name == "auto":
-            ports = SerialPrinterDevice.list_comports()
-            if len(ports) > 0:
-                dev = SerialPrinterDevice(SerialPrinterDevice.list_comports()[0])
+            dev = comms.find_default_device()
         else:
-            dev =  SerialPrinterDevice.find(self.device_name)
-
+            dev = comms.find_device(self.device_type, self.device_name)
         return dev
 
     def set_label_maker_config(self, config: LabelMakerConfig):
@@ -126,7 +124,7 @@ class CliPrint:
 
     @classmethod
     def create(cls, args: Namespace) -> 'CliPrint':
-        cli = cls(args.device)
+        cli = cls(args.device, args.device_type)
 
         config = dataclass_from_args(args, LabelMakerConfig)
         cli.set_label_maker_config(config)

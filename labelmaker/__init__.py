@@ -5,13 +5,12 @@ from typing import Optional
 
 from .encode import encode_raster_transfer, read_png
 from .config import LabelMakerConfig
-from labelmaker.comms import PrinterDevice, SerialPrinterDevice
+from .const import *
+from comms import PrinterDevice
 from labelmaker.format import Mode
 from labelmaker.status import Status
 
-BUFFER_HEIGHT = 128
-PRINT_MARGIN = 30
-USABLE_HEIGHT = BUFFER_HEIGHT - (PRINT_MARGIN * 2)
+
 
 log = logging.getLogger(__name__)
 
@@ -36,7 +35,7 @@ class LabelMaker:
     def query_status(self):
         self.log("Query status...")
         self.ser.write(b"\x1b\x69\x53")
-        raw = self.ser.read(size=32)
+        raw = self.ser.read(32)
         return raw
 
     def print_status(self, raw: bytes):
@@ -193,25 +192,9 @@ class LabelMaker:
         ser.write(b"\x1A")
 
         # Dump status that the printer returns
-        self.print_status(ser.read(size=32))
+        self.print_status(ser.read(32))
 
         # Initialize
         ser.write(b"\x1b\x40")
 
         ser.close()
-
-
-if __name__ == '__main__':
-    # Check for input image
-    if len(sys.argv) < 2:
-        print("Usage:", sys.argv[0], "<path-to-image>")
-        sys.exit(1)
-
-    print('Labelmaker CLI')
-
-    # Read input image into memory
-    image_data = read_png(sys.argv[1])
-    device = sys.argv[2]
-
-    label_maker = LabelMaker(SerialPrinterDevice.find(device))
-    label_maker.print_label(image_data)

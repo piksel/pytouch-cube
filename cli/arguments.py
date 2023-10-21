@@ -61,6 +61,7 @@ def get_parser():
     runtime.default = "gui"
     gui = runtime.add_parser("gui", help="Use the utlity in GUI mode")
     cli = runtime.add_parser("print", help="Print using suplied arguments")
+    dev = runtime.add_parser("devices", help="List devices")
 
     ## configure gui parser
     gui.add_argument("--seed", help="Setup the GUI with example printables", action="store_true")
@@ -71,6 +72,7 @@ def get_parser():
     cli_setup_labelmakerconfig(config, LabelMakerConfig)
     config.add_argument("--default-font", type=str, default="auto")
     config.add_argument("--device", type=str, default="auto")
+    config.add_argument("--device-type", type=str, default="serial", choices=["serial", "bluetooth"])
     config.add_argument("--output", type=str, help="don't print just write the output to a png")
 
     ### define the print modes
@@ -106,6 +108,8 @@ def get_parser():
         "label_file_name", help="File path to label project file",
         type=str)
 
+
+    dev.add_argument("--type", type=str, default="all", choices=["all", "bluetooth", "serial"])
 
     return parser
 
